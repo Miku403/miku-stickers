@@ -5,8 +5,8 @@
 <meta charset="UTF-8">
 
 <meta
-name="viewport"
-content="width=device-width, initial-scale=1.0"
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
 >
 
 <title>𝘔𝘐𝘒𝘜 𝘚𝘛𝘐𝘊𝘒𝘌𝘙𝘚</title>
@@ -243,29 +243,26 @@ button:disabled{
 حوّل صورك إلى ملصقات 🎀
 </div>
 
-
 <div class="card">
-
 
 <label class="title">
 اسم حزمة الملصقات
 </label>
 
 <input
-id="packName"
-type="text"
-placeholder="مثلاً: Miku Stickers"
-maxlength="128"
+  id="packName"
+  type="text"
+  placeholder="مثلاً: Miku Stickers"
+  maxlength="128"
 >
-
 
 <label class="upload">
 
 <input
-id="fileInput"
-type="file"
-accept="image/*"
-multiple
+  id="fileInput"
+  type="file"
+  accept="image/*"
+  multiple
 >
 
 <strong>
@@ -278,57 +275,45 @@ multiple
 
 </label>
 
-
 <div
-id="count"
-class="count">
+  id="count"
+  class="count">
 </div>
 
-
 <div
-id="preview"
-class="preview">
+  id="preview"
+  class="preview">
 </div>
-
 
 <button
-id="convertBtn"
-disabled>
-
+  id="convertBtn"
+  disabled
+>
 ⚙️ تحويل إلى ملصقات
-
 </button>
-
 
 <button
-id="packBtn"
-disabled>
-
+  id="packBtn"
+  disabled
+>
 🎀 إنشاء حزمة .wastickers
-
 </button>
 
-
 <div
-id="status"
-class="status">
+  id="status"
+  class="status">
 </div>
 
-
-<div
-id="resultSection">
-
+<div id="resultSection">
 
 <div class="resultTitle">
 🎀 ملصقاتك الجاهزة
 </div>
 
-
 <div
-id="stickers"
-class="stickers">
+  id="stickers"
+  class="stickers">
 </div>
-
 
 <div class="packInfo">
 
@@ -336,15 +321,15 @@ class="stickers">
 
 <br>
 
-• ملصقات WebP
+• جميع الملصقات 512×512 بالضبط
 
 <br>
 
-• مقاس أصلي يصل إلى 512×512
+• WebP
 
 <br>
 
-• حجم الملصق ≤100KB
+• حجم مستهدف أقل من 100KB
 
 <br>
 
@@ -360,25 +345,23 @@ class="stickers">
 
 </div>
 
-
 </div>
-
 
 <div class="info">
 
-كل صورة يتم تحويلها إلى
-WebP.
+كل ملصق يتم تحويله إلى
+<strong>512×512</strong>
+بكسل بالضبط.
 
-إذا كان حجمها أقل من
+إذا كان حجم الملف أقل من
 <strong>100KB</strong>
-فلن يتم ضغطها.
+فلن يتم ضغطه.
 
-إذا تجاوزت
-<strong>100KB</strong>
-سيتم البحث تلقائيًا عن أفضل جودة ممكنة تحت الحد.
+إذا كان أكبر من ذلك، يتم تقليل
+<strong>الجودة فقط</strong>
+مع الحفاظ على أبعاد 512×512.
 
 </div>
-
 
 </div>
 
@@ -387,55 +370,36 @@ WebP.
 
 <script>
 
-
 /* =========================
    العناصر
 ========================= */
 
 const fileInput =
-document.getElementById(
-"fileInput"
-);
+document.getElementById("fileInput");
 
 const packName =
-document.getElementById(
-"packName"
-);
+document.getElementById("packName");
 
 const preview =
-document.getElementById(
-"preview"
-);
+document.getElementById("preview");
 
 const count =
-document.getElementById(
-"count"
-);
+document.getElementById("count");
 
 const convertBtn =
-document.getElementById(
-"convertBtn"
-);
+document.getElementById("convertBtn");
 
 const packBtn =
-document.getElementById(
-"packBtn"
-);
+document.getElementById("packBtn");
 
 const status =
-document.getElementById(
-"status"
-);
+document.getElementById("status");
 
 const resultSection =
-document.getElementById(
-"resultSection"
-);
+document.getElementById("resultSection");
 
 const stickersContainer =
-document.getElementById(
-"stickers"
-);
+document.getElementById("stickers");
 
 
 let files = [];
@@ -456,15 +420,11 @@ Array.from(
 fileInput.files || []
 );
 
-
 selected =
 selected.filter(
 file =>
-file.type.startsWith(
-"image/"
-)
+file.type.startsWith("image/")
 );
-
 
 if(selected.length > 30){
 
@@ -472,7 +432,6 @@ selected =
 selected.slice(0,30);
 
 }
-
 
 files = selected;
 
@@ -521,33 +480,25 @@ files.forEach(
 file => {
 
 const item =
-document.createElement(
-"div"
-);
+document.createElement("div");
 
 item.className =
 "preview-item";
 
 
 const img =
-document.createElement(
-"img"
-);
+document.createElement("img");
 
 
 const url =
-URL.createObjectURL(
-file
-);
+URL.createObjectURL(file);
 
 img.src = url;
 
 
 img.onload = () => {
 
-URL.revokeObjectURL(
-url
-);
+URL.revokeObjectURL(url);
 
 };
 
@@ -585,44 +536,58 @@ quality
 
 
 /* =========================
-   رسم الصورة
+   تحويل الصورة
+   512×512 دائمًا
 ========================= */
 
-function drawImageToCanvas(
-image,
-size
+async function makeSticker(
+file
 ){
 
+const image =
+await createImageBitmap(file);
+
+const MAX_SIZE =
+100 * 1024;
+
+
+/*
+  Canvas ثابت:
+  512×512 بالضبط
+*/
+
 const canvas =
-document.createElement(
-"canvas"
-);
+document.createElement("canvas");
 
-canvas.width = size;
-
-canvas.height = size;
+canvas.width = 512;
+canvas.height = 512;
 
 
 const ctx =
 canvas.getContext("2d");
 
 
+/*
+  تأكيد الشفافية
+*/
+
 ctx.clearRect(
 0,
 0,
-size,
-size
+512,
+512
 );
 
 
-const margin =
-Math.round(
-size * 0.03
-);
+/*
+  حساب أبعاد الصورة
+  مع الحفاظ على النسبة
+*/
 
+const margin = 16;
 
 const available =
-size - margin * 2;
+512 - (margin * 2);
 
 
 const scale =
@@ -640,11 +605,16 @@ image.height * scale;
 
 
 const x =
-(size - width) / 2;
+(512 - width) / 2;
 
 const y =
-(size - height) / 2;
+(512 - height) / 2;
 
+
+/*
+  رسم الصورة داخل
+  Canvas 512×512
+*/
 
 ctx.drawImage(
 image,
@@ -655,63 +625,12 @@ height
 );
 
 
-return canvas;
-
-}
+image.close();
 
 
 /* =========================
-   تحويل الصورة
+   محاولة بجودة عالية
 ========================= */
-
-async function makeSticker(
-file
-){
-
-const image =
-await createImageBitmap(
-file
-);
-
-
-const MAX_SIZE =
-100 * 1024;
-
-
-/*
-  الأحجام التي سنجربها.
-
-  نبدأ 512×512،
-  وإذا احتجنا نصغر تدريجيًا.
-*/
-
-const sizes = [
-512,
-480,
-448,
-416,
-384,
-352,
-320,
-288,
-256
-];
-
-
-for(
-const size of sizes
-){
-
-const canvas =
-drawImageToCanvas(
-image,
-size
-);
-
-
-/*
-  أولًا نجرب جودة عالية جدًا.
-*/
 
 let blob =
 await canvasToWebP(
@@ -721,28 +640,26 @@ canvas,
 
 
 /*
-  إذا كانت الصورة تحت 100KB
-  من البداية، نرجعها فورًا.
+  إذا كانت أقل من 100KB
+  نستخدمها مباشرة.
 */
 
 if(
+blob &&
 blob.size <= MAX_SIZE
 ){
-
-image.close();
 
 return blob;
 
 }
 
 
-/*
-  Binary Search
-  للعثور على أعلى جودة
-  تحقق شرط 100KB.
-*/
+/* =========================
+   البحث عن أعلى جودة
+   تحت 100KB
+========================= */
 
-let low = 0.10;
+let low = 0.01;
 
 let high = 0.90;
 
@@ -751,7 +668,7 @@ let bestBlob = null;
 
 for(
 let i = 0;
-i < 9;
+i < 14;
 i++
 ){
 
@@ -767,6 +684,7 @@ quality
 
 
 if(
+blob &&
 blob.size <= MAX_SIZE
 ){
 
@@ -784,55 +702,34 @@ high = quality;
 
 
 /*
-  إذا وجدنا جودة مناسبة،
-  نستخدمها.
+  وجدنا نسخة مناسبة
 */
 
 if(bestBlob){
-
-image.close();
 
 return bestBlob;
 
 }
 
-}
 
+/* =========================
+   آخر محاولة
+========================= */
 
-/*
-  كحل أخير جدًا:
-  256×256 وجودة منخفضة.
-*/
-
-const finalCanvas =
-drawImageToCanvas(
-image,
-256
-);
-
-
-const finalBlob =
+blob =
 await canvasToWebP(
-finalCanvas,
-0.05
+canvas,
+0.01
 );
 
 
-image.close();
-
-
-/*
-  حتى لو كانت أكبر بقليل،
-  نرجعها بدل ما نوقف العملية.
-*/
-
-return finalBlob;
+return blob;
 
 }
 
 
 /* =========================
-   الغلاف
+   إنشاء الغلاف
 ========================= */
 
 async function makeCover(
@@ -959,7 +856,6 @@ file
 
 }else{
 
-
 const url =
 URL.createObjectURL(
 sticker.blob
@@ -967,9 +863,7 @@ sticker.blob
 
 
 const link =
-document.createElement(
-"a"
-);
+document.createElement("a");
 
 
 link.href = url;
@@ -981,7 +875,6 @@ sticker.name;
 document.body.appendChild(
 link
 );
-
 
 link.click();
 
@@ -1000,7 +893,6 @@ url
 );
 
 }
-
 
 }catch(error){
 
@@ -1027,7 +919,6 @@ function showStickers(){
 stickersContainer.innerHTML =
 "";
 
-
 resultSection.style.display =
 "block";
 
@@ -1035,21 +926,15 @@ resultSection.style.display =
 stickers.forEach(
 (sticker,index) => {
 
-
 const box =
-document.createElement(
-"div"
-);
-
+document.createElement("div");
 
 box.className =
 "sticker";
 
 
 const img =
-document.createElement(
-"img"
-);
+document.createElement("img");
 
 
 const url =
@@ -1057,15 +942,11 @@ URL.createObjectURL(
 sticker.blob
 );
 
-
 img.src = url;
 
 
 const shareButton =
-document.createElement(
-"button"
-);
-
+document.createElement("button");
 
 shareButton.textContent =
 "📤 مشاركة";
@@ -1084,10 +965,7 @@ index
 
 
 const size =
-document.createElement(
-"div"
-);
-
+document.createElement("div");
 
 size.className =
 "size";
@@ -1136,20 +1014,16 @@ convertBtn.disabled = true;
 
 packBtn.disabled = true;
 
-
 stickers = [];
-
 
 stickersContainer.innerHTML =
 "";
-
 
 resultSection.style.display =
 "none";
 
 
 try{
-
 
 for(
 let i = 0;
@@ -1199,7 +1073,6 @@ packBtn.disabled = false;
 
 console.error(error);
 
-
 status.textContent =
 "حدث خطأ أثناء التحويل: " +
 error.message;
@@ -1213,7 +1086,7 @@ convertBtn.disabled = false;
 
 
 /* =========================
-   إنشاء WASTICKERS
+   إنشاء حزمة WASTICKERS
 ========================= */
 
 packBtn.addEventListener(
@@ -1249,7 +1122,6 @@ status.textContent =
 
 
 try{
-
 
 const zip =
 new JSZip();
@@ -1316,7 +1188,7 @@ stickers[i].blob
 
 
 /*
-  إنشاء الأرشيف
+  إنشاء الملف
 */
 
 status.textContent =
@@ -1338,7 +1210,7 @@ level:6
 
 
 /*
-  تحميل الحزمة
+  تحميل .wastickers
 */
 
 const url =
@@ -1348,9 +1220,7 @@ wastickers
 
 
 const link =
-document.createElement(
-"a"
-);
+document.createElement("a");
 
 
 link.href = url;
