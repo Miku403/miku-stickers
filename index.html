@@ -257,9 +257,15 @@ multiple
 
 </label>
 
-<div id="count" class="count"></div>
+<div
+id="count"
+class="count">
+</div>
 
-<div id="preview" class="preview"></div>
+<div
+id="preview"
+class="preview">
+</div>
 
 <button
 id="convertBtn"
@@ -273,15 +279,22 @@ disabled>
 🎀 إنشاء حزمة .wastickers
 </button>
 
-<div id="status" class="status"></div>
+<div
+id="status"
+class="status">
+</div>
 
-<div id="resultSection">
+<div
+id="resultSection">
 
 <div class="resultTitle">
 🎀 ملصقاتك الجاهزة
 </div>
 
-<div id="stickers" class="stickers"></div>
+<div
+id="stickers"
+class="stickers">
+</div>
 
 <div class="packInfo">
 الحزمة تحتوي على:
@@ -300,11 +313,15 @@ disabled>
 <div class="info">
 
 كل ملصق يتم تحويله إلى
-512×512 WebP وبحد أقصى 100KB.
+512×512 WebP.
 
-بعد إنشاء الحزمة اضغط
-<strong>إنشاء حزمة .wastickers</strong>
-لتحميلها.
+إذا كان حجم الملصق أقل من
+<strong>100KB</strong>
+فلا يتم ضغطه.
+
+أما إذا تجاوز
+<strong>100KB</strong>
+فيتم ضغطه تدريجيًا حتى يصبح مناسبًا.
 
 </div>
 
@@ -449,13 +466,43 @@ preview.appendChild(item);
 
 
 /* =========================
-   تحويل الصورة إلى WebP
+   Canvas → WebP
+========================= */
+
+function canvasToWebP(
+canvas,
+quality
+){
+
+return new Promise(
+resolve => {
+
+canvas.toBlob(
+blob => resolve(blob),
+"image/webp",
+quality
+);
+
+});
+
+}
+
+
+/* =========================
+   تحويل الصورة
 ========================= */
 
 async function makeSticker(file){
 
 const image =
 await createImageBitmap(file);
+
+const originalWidth =
+image.width;
+
+const originalHeight =
+image.height;
+
 
 const canvas =
 document.createElement("canvas");
@@ -475,8 +522,7 @@ ctx.clearRect(
 
 
 /*
-  نفس فكرة المشروع المرجعي:
-  نترك هامش 16px.
+  هامش بسيط حول الملصق
 */
 
 const margin = 16;
@@ -484,17 +530,18 @@ const margin = 16;
 const inner =
 512 - margin * 2;
 
+
 const scale =
 Math.min(
-inner / image.width,
-inner / image.height
+inner / originalWidth,
+inner / originalHeight
 );
 
 const width =
-image.width * scale;
+originalWidth * scale;
 
 const height =
-image.height * scale;
+originalHeight * scale;
 
 const x =
 (512 - width) / 2;
@@ -514,63 +561,168 @@ height
 image.close();
 
 
-/*
-  نحاول النزول تحت 100KB
-*/
+const MAX_SIZE =
+100 * 1024;
 
-let quality = 0.90;
 
-let blob = null;
+/* =========================
+   أول محاولة
+========================= */
 
-while(
-quality >= 0.20
-){
-
-blob =
-await new Promise(
-resolve => {
-
-canvas.toBlob(
-result =>
-resolve(result),
-"image/webp",
-quality
+let blob =
+await canvasToWebP(
+canvas,
+0.92
 );
 
-});
+
+/*
+  إذا كان الحجم مناسبًا،
+  لا نضغط أكثر.
+*/
 
 if(
-blob &&
-blob.size <=
-100 * 1024
+blob.size <= MAX_SIZE
 ){
 
 return blob;
 
 }
 
-quality -= 0.04;
+
+/* =========================
+   ضغط تدريجي
+========================= */
+
+for(
+let quality = 0.88;
+quality >= 0.20;
+quality -= 0.04
+){
+
+blob =
+await canvasToWebP(
+canvas,
+quality
+);
+
+
+if(
+blob.size <= MAX_SIZE
+){
+
+return blob;
 
 }
+
+}
+
+
+/* =========================
+   محاولة أخيرة
+========================= */
+
+blob =
+await canvasToWebP(
+canvas,
+0.15
+);
+
+
+if(
+blob.size <= MAX_SIZE
+){
+
+return blob;
+
+}
+
+
+/* =========================
+   تصغير الأبعاد كحل أخير
+========================= */
+
+for(
+let size = 448;
+size >= 256;
+size -= 32
+){
+
+const smaller =
+document.createElement("canvas");
+
+smaller.width = size;
+smaller.height = size;
+
+
+const smallerCtx =
+smaller.getContext("2d");
+
+smallerCtx.clearRect(
+0,
+0,
+size,
+size
+);
+
+
+const scale =
+Math.min(
+(size - 16) / originalWidth,
+(size - 16) / originalHeight
+);
+
+const width =
+originalWidth * scale;
+
+const height =
+originalHeight * scale;
+
+const x =
+(size - width) / 2;
+
+const y =
+(size - height) / 2;
 
 
 /*
-  إذا لم نصل إلى 100KB
+  نعيد رسم الصورة الأصلية
+  بالحجم الأصغر.
 */
 
+smallerCtx.drawImage(
+canvas,
+0,
+0,
+512,
+512,
+0,
+0,
+size,
+size
+);
+
+
+blob =
+await canvasToWebP(
+smaller,
+0.70
+);
+
+
 if(
-blob &&
-blob.size > 100 * 1024
+blob.size <= MAX_SIZE
 ){
 
-throw new Error(
-`الصورة حجمها أكبر من 100KB حتى بعد الضغط`
-);
+return blob;
 
 }
 
+}
+
+
 throw new Error(
-"فشل تحويل الصورة"
+"تعذر ضغط الصورة إلى أقل من 100KB"
 );
 
 }
@@ -585,11 +737,13 @@ async function makeCover(file){
 const image =
 await createImageBitmap(file);
 
+
 const canvas =
 document.createElement("canvas");
 
 canvas.width = 96;
 canvas.height = 96;
+
 
 const ctx =
 canvas.getContext("2d");
@@ -600,6 +754,7 @@ ctx.clearRect(
 96,
 96
 );
+
 
 const scale =
 Math.min(
@@ -631,7 +786,7 @@ height
 image.close();
 
 
-let blob =
+const blob =
 await new Promise(
 resolve => {
 
@@ -644,127 +799,7 @@ resolve(result),
 });
 
 
-/*
-  إذا كان الغلاف أكبر من 50KB
-  نصغره مرة أخرى.
-*/
-
-if(
-blob.size <=
-50 * 1024
-){
-
 return blob;
-
-}
-
-
-const small =
-document.createElement("canvas");
-
-small.width = 72;
-small.height = 72;
-
-small.getContext("2d")
-.drawImage(
-canvas,
-0,
-0,
-72,
-72
-);
-
-
-blob =
-await new Promise(
-resolve => {
-
-small.toBlob(
-result =>
-resolve(result),
-"image/png"
-);
-
-});
-
-return blob;
-
-}
-
-
-/* =========================
-   عرض الملصقات
-========================= */
-
-function showStickers(){
-
-stickersContainer.innerHTML = "";
-
-resultSection.style.display =
-"block";
-
-
-stickers.forEach(
-(sticker,index)=>{
-
-const box =
-document.createElement("div");
-
-box.className =
-"sticker";
-
-
-const img =
-document.createElement("img");
-
-const url =
-URL.createObjectURL(
-sticker.blob
-);
-
-img.src = url;
-
-
-const shareButton =
-document.createElement("button");
-
-shareButton.textContent =
-"📤 مشاركة";
-
-
-shareButton.addEventListener(
-"click",
-()=>{
-shareSticker(
-sticker,
-index
-);
-});
-
-
-const size =
-document.createElement("div");
-
-size.className =
-"size";
-
-size.textContent =
-`${(sticker.blob.size / 1024).toFixed(1)} KB`;
-
-
-box.appendChild(img);
-
-box.appendChild(
-shareButton
-);
-
-box.appendChild(size);
-
-stickersContainer.appendChild(
-box
-);
-
-});
 
 }
 
@@ -828,6 +863,7 @@ link.click();
 
 link.remove();
 
+
 setTimeout(
 ()=>{
 URL.revokeObjectURL(url);
@@ -854,7 +890,86 @@ console.error(error);
 
 
 /* =========================
-   تحويل كل الصور
+   عرض الملصقات
+========================= */
+
+function showStickers(){
+
+stickersContainer.innerHTML = "";
+
+resultSection.style.display =
+"block";
+
+
+stickers.forEach(
+(sticker,index)=>{
+
+const box =
+document.createElement("div");
+
+box.className =
+"sticker";
+
+
+const img =
+document.createElement("img");
+
+const url =
+URL.createObjectURL(
+sticker.blob
+);
+
+img.src = url;
+
+
+const shareButton =
+document.createElement("button");
+
+shareButton.textContent =
+"📤 مشاركة";
+
+
+shareButton.addEventListener(
+"click",
+()=>{
+shareSticker(
+sticker,
+index
+);
+});
+
+
+const size =
+document.createElement("div");
+
+size.className =
+"size";
+
+size.textContent =
+`${(
+sticker.blob.size / 1024
+).toFixed(1)} KB`;
+
+
+box.appendChild(img);
+
+box.appendChild(
+shareButton
+);
+
+box.appendChild(size);
+
+stickersContainer.appendChild(
+box
+);
+
+});
+
+}
+
+
+/* =========================
+   تحويل الصور
 ========================= */
 
 convertBtn.addEventListener(
@@ -899,7 +1014,9 @@ files[i]
 stickers.push({
 
 name:
-`${Math.floor(Date.now()/1000) + i + 1}.webp`,
+`sticker_${String(
+i + 1
+).padStart(2,"0")}.webp`,
 
 blob:
 blob
@@ -935,7 +1052,7 @@ convertBtn.disabled = false;
 
 
 /* =========================
-   إنشاء حزمة .wastickers
+   إنشاء حزمة WASTICKERS
 ========================= */
 
 packBtn.addEventListener(
@@ -950,6 +1067,7 @@ return;
 let title =
 packName.value.trim();
 
+
 if(!title){
 
 title =
@@ -961,7 +1079,7 @@ title =
 packBtn.disabled = true;
 
 status.textContent =
-"🎀 جاري إنشاء حزمة .wastickers...";
+"🎀 جاري إنشاء الحزمة...";
 
 
 try{
@@ -971,13 +1089,7 @@ new JSZip();
 
 
 /*
-  هذه هي بنية المشروع المرجعي:
-  title.txt
-  author.txt
-  cover.png
-  3.webp
-  4.webp
-  ...
+  بيانات الحزمة
 */
 
 zip.file(
@@ -992,7 +1104,7 @@ zip.file(
 
 
 /*
-  أول صورة تصبح الغلاف
+  الغلاف
 */
 
 const cover =
@@ -1007,10 +1119,10 @@ cover
 
 
 /*
-  إضافة الملصقات
+  الملصقات
 */
 
-let timestamp =
+const timestamp =
 Math.floor(
 Date.now() / 1000
 );
@@ -1026,29 +1138,20 @@ status.textContent =
 `📦 إضافة الملصق ${i + 1} من ${stickers.length}...`;
 
 
-const sticker =
-stickers[i];
-
-
-/*
-  نفس نمط المشروع المرجعي:
-  أسماء رقمية متسلسلة
-*/
-
 zip.file(
 `${timestamp + i + 1}.webp`,
-sticker.blob
+stickers[i].blob
 );
 
 }
 
 
 /*
-  إنشاء الملف النهائي
+  ضغط الحزمة
 */
 
 status.textContent =
-"📦 ضغط الحزمة...";
+"📦 تجهيز الملف النهائي...";
 
 
 const wastickers =
@@ -1066,7 +1169,7 @@ level:6
 
 
 /*
-  تنزيل الملف بامتداد .wastickers
+  تحميل الملف
 */
 
 const url =
@@ -1098,7 +1201,7 @@ URL.revokeObjectURL(url);
 
 
 status.textContent =
-"✅ تم إنشاء حزمة .wastickers بنجاح 🎀";
+"✅ تم إنشاء حزمة .wastickers 🎀";
 
 
 }catch(error){
@@ -1118,7 +1221,7 @@ packBtn.disabled = false;
 
 
 /* =========================
-   اسم الملف
+   تنظيف اسم الملف
 ========================= */
 
 function slugify(text){
@@ -1126,10 +1229,22 @@ function slugify(text){
 return text
 .toLowerCase()
 .trim()
-.replace(/[^a-z0-9._ -]/g,"")
-.replace(/\s+/g,"_")
-.replace(/_+/g,"_")
-.slice(0,64)
+.replace(
+/[^a-z0-9._ -]/g,
+""
+)
+.replace(
+/\s+/g,
+"_"
+)
+.replace(
+/_+/g,
+"_"
+)
+.slice(
+0,
+64
+)
 ||
 "miku_stickers";
 
