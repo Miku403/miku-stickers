@@ -15,6 +15,10 @@ import {
 } from "./utils.js";
 
 
+/* =========================
+   Elements
+========================= */
+
 const fileInput =
   document.getElementById("fileInput");
 
@@ -37,19 +41,27 @@ const whatsappButton =
   document.getElementById("whatsappButton");
 
 
+/* =========================
+   State
+========================= */
+
 let processedStickers = [];
+
 let currentPack = null;
 
 
 /* =========================
-   STATUS
+   Status
 ========================= */
 
 function setStatus(message) {
 
+  if (!status) {
+    return;
+  }
+
   status.textContent =
     message;
-
 }
 
 
@@ -61,36 +73,31 @@ function setBridgeStatus(message) {
 
   bridgeStatus.textContent =
     message;
-
 }
 
 
 /* =========================
-   RESET
+   Reset
 ========================= */
 
 function resetProject() {
 
   processedStickers = [];
+
   currentPack = null;
 
   preview.innerHTML = "";
 
-  createButton.disabled =
-    true;
+  createButton.disabled = true;
 
-  whatsappButton.disabled =
-    true;
-
-  setStatus("");
+  whatsappButton.disabled = true;
 
   setBridgeStatus("");
-
 }
 
 
 /* =========================
-   IMAGE PREVIEW
+   Preview Card
 ========================= */
 
 function createStickerCard(
@@ -99,32 +106,42 @@ function createStickerCard(
 ) {
 
   const card =
-    document.createElement(
-      "div"
-    );
+    document.createElement("div");
 
   card.className =
     "sticker-card";
 
 
   const img =
-    document.createElement(
-      "img"
-    );
+    document.createElement("img");
 
-  img.src =
+
+  const imageUrl =
     URL.createObjectURL(
       sticker.blob
     );
+
+
+  img.src =
+    imageUrl;
+
 
   img.alt =
     `Sticker ${index + 1}`;
 
 
+  img.onload = () => {
+
+    /*
+      لا نحذف الـ URL مباشرة
+      حتى تبقى الصورة ظاهرة.
+    */
+
+  };
+
+
   const number =
-    document.createElement(
-      "div"
-    );
+    document.createElement("div");
 
   number.className =
     "sticker-number";
@@ -134,9 +151,7 @@ function createStickerCard(
 
 
   const size =
-    document.createElement(
-      "div"
-    );
+    document.createElement("div");
 
   size.className =
     "sticker-size";
@@ -158,7 +173,7 @@ function createStickerCard(
 
 
 /* =========================
-   FILE INPUT
+   File Input
 ========================= */
 
 fileInput.addEventListener(
@@ -174,10 +189,15 @@ fileInput.addEventListener(
       );
 
 
-    /*
-      WhatsApp sticker packs
-      require 3–30 stickers.
-    */
+    console.log(
+      "Selected files:",
+      files
+    );
+
+
+    /* =====================
+       Validate Count
+    ===================== */
 
     if (
       files.length < 3 ||
@@ -185,7 +205,8 @@ fileInput.addEventListener(
     ) {
 
       setStatus(
-        "اختر من 3 إلى 30 صورة."
+        `تم اختيار ${files.length} صورة. ` +
+        `اختر من 3 إلى 30 صورة.`
       );
 
       return;
@@ -195,9 +216,14 @@ fileInput.addEventListener(
     try {
 
       setStatus(
-        "جاري تجهيز الملصقات..."
+        `تم اختيار ${files.length} صورة، ` +
+        `جاري تجهيزها...`
       );
 
+
+      /* ===================
+         Process Images
+      =================== */
 
       for (
         let i = 0;
@@ -215,16 +241,21 @@ fileInput.addEventListener(
         );
 
 
+        console.log(
+          `Processing ${i + 1}:`,
+          file.name
+        );
+
+
         const sticker =
           await processSticker(
             file
           );
 
 
-        /*
-          تأكيد إضافي:
-          الناتج يجب أن يكون 512×512.
-        */
+        /* =================
+           Validate Sticker
+        ================= */
 
         if (
           sticker.width !== 512 ||
@@ -237,10 +268,6 @@ fileInput.addEventListener(
 
         }
 
-
-        /*
-          تأكيد الحجم.
-        */
 
         if (
           sticker.size >
@@ -259,6 +286,10 @@ fileInput.addEventListener(
         );
 
 
+        /* =================
+           Show Preview
+        ================= */
+
         const card =
           createStickerCard(
             sticker,
@@ -270,8 +301,17 @@ fileInput.addEventListener(
           card
         );
 
+
+        console.log(
+          `Sticker ${i + 1} ready`
+        );
+
       }
 
+
+      /* =====================
+         Finished
+      ===================== */
 
       createButton.disabled =
         false;
@@ -281,6 +321,11 @@ fileInput.addEventListener(
         `تم تجهيز ${files.length} ملصقات ✓`
       );
 
+
+      console.log(
+        "All stickers ready:",
+        processedStickers
+      );
 
     } catch (error) {
 
@@ -314,7 +359,7 @@ fileInput.addEventListener(
 
 
 /* =========================
-   CREATE PACK
+   Create WhatsApp Pack
 ========================= */
 
 createButton.addEventListener(
@@ -364,10 +409,6 @@ createButton.addEventListener(
       }
 
 
-      /*
-        تأكيدات إضافية على الـ Pack.
-      */
-
       if (
         !Array.isArray(
           currentPack.stickers
@@ -407,11 +448,6 @@ createButton.addEventListener(
       }
 
 
-      /*
-        الحزمة أصبحت جاهزة
-        للـ Native Bridge.
-      */
-
       whatsappButton.disabled =
         false;
 
@@ -426,15 +462,10 @@ createButton.addEventListener(
       );
 
 
-      /*
-        مفيد أثناء التطوير.
-      */
-
       console.log(
         "Miku Sticker Pack:",
         currentPack
       );
-
 
     } catch (error) {
 
@@ -444,8 +475,7 @@ createButton.addEventListener(
       );
 
 
-      currentPack =
-        null;
+      currentPack = null;
 
 
       whatsappButton.disabled =
@@ -472,7 +502,7 @@ createButton.addEventListener(
 
 
 /* =========================
-   SEND TO NATIVE BRIDGE
+   Send To WhatsApp
 ========================= */
 
 whatsappButton.addEventListener(
@@ -511,10 +541,6 @@ whatsappButton.addEventListener(
         );
 
 
-      /*
-        WKWebView Native Bridge
-      */
-
       if (
         result &&
         result.method === "webkit"
@@ -533,10 +559,6 @@ whatsappButton.addEventListener(
         return;
       }
 
-
-      /*
-        Custom URL Scheme
-      */
 
       if (
         result &&
@@ -557,14 +579,9 @@ whatsappButton.addEventListener(
       }
 
 
-      /*
-        نتيجة غير معروفة.
-      */
-
       setStatus(
         "تم إرسال الطلب."
       );
-
 
     } catch (error) {
 
@@ -586,11 +603,6 @@ whatsappButton.addEventListener(
 
     } finally {
 
-      /*
-        نعطي النظام لحظة قبل
-        إعادة تفعيل الزر.
-      */
-
       setTimeout(
         () => {
 
@@ -608,7 +620,7 @@ whatsappButton.addEventListener(
 
 
 /* =========================
-   NATIVE BRIDGE RESULT
+   Native Bridge Result
 ========================= */
 
 window.addEventListener(
@@ -664,12 +676,13 @@ window.addEventListener(
 
 
 /* =========================
-   INITIAL STATE
+   Initial State
 ========================= */
 
 setStatus(
   "اختر من 3 إلى 30 صورة."
 );
+
 
 setBridgeStatus(
   "Miku Stickers جاهز."
