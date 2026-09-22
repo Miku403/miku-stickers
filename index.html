@@ -503,10 +503,104 @@ downloadBtn.disabled=false;
 
 };
 
+downloadBtn.onclick = async function(){
 
-downloadBtn.onclick=
-async function(){
+  if(!stickers.length) return;
 
+  const packName =
+    document.getElementById("packName")
+      .value
+      .trim() || "Miku Stickers";
+
+  const authorName = "𝘔𝘐𝘒𝘜 𝘚𝘛𝘐𝘊𝘒𝘌𝘙𝘚";
+
+  const zip = new JSZip();
+
+  // معلومات الحزمة
+  zip.file("title.txt", packName);
+  zip.file("author.txt", authorName);
+
+  // الملصقات تكون في جذر الملف
+  stickers.forEach((sticker) => {
+    zip.file(sticker.name, sticker.blob);
+  });
+
+  // إنشاء صورة غلاف من أول ملصق
+  const firstFile = files[0];
+
+  const image = await createImageBitmap(firstFile);
+
+  const canvas = document.createElement("canvas");
+
+  canvas.width = 96;
+  canvas.height = 96;
+
+  const ctx = canvas.getContext("2d");
+
+  ctx.clearRect(0, 0, 96, 96);
+
+  const scale = Math.min(
+    96 / image.width,
+    96 / image.height
+  );
+
+  const width = image.width * scale;
+  const height = image.height * scale;
+
+  const x = (96 - width) / 2;
+  const y = (96 - height) / 2;
+
+  ctx.drawImage(
+    image,
+    x,
+    y,
+    width,
+    height
+  );
+
+  image.close();
+
+  const coverBlob = await new Promise(resolve => {
+
+    canvas.toBlob(
+      blob => resolve(blob),
+      "image/png"
+    );
+
+  });
+
+  zip.file("tray.png", coverBlob);
+
+  status.textContent =
+    "جاري إنشاء ملف الملصقات...";
+
+  const wastickerBlob =
+    await zip.generateAsync({
+      type: "blob"
+    });
+
+  const link =
+    document.createElement("a");
+
+  link.href =
+    URL.createObjectURL(wastickerBlob);
+
+  link.download =
+    packName
+      .replace(/[\\/:*?"<>|]/g, "_")
+    + ".wasticker";
+
+  link.click();
+
+  setTimeout(() => {
+    URL.revokeObjectURL(link.href);
+  }, 2000);
+
+  status.textContent =
+    "تم إنشاء ملف .wasticker 🎀";
+
+};
+  
 if(!stickers.length)return;
 
 
