@@ -1,891 +1,774 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>𝘔𝘐𝘒𝘜 𝘚𝘛𝘐𝘊𝘒𝘌𝘙𝘚</title>
+<title>𝘔𝘐𝘒𝘜 𝘚𝘛𝘐𝘊𝘒𝘌𝘙𝘚</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<style>
+*{
+  box-sizing:border-box;
+}
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+body{
+  margin:0;
+  background:#f5f5f5;
+  color:#222;
+  font-family:Arial,sans-serif;
+}
 
-    body {
-      margin: 0;
-      background: #f5f5f5;
-      color: #222;
-      font-family: Arial, sans-serif;
-    }
+.container{
+  width:min(900px,92%);
+  margin:30px auto;
+}
 
-    .container {
-      width: min(900px, 92%);
-      margin: 35px auto;
-    }
+h1{
+  text-align:center;
+  font-size:32px;
+  margin:0;
+}
 
-    h1 {
-      text-align: center;
-      margin: 0;
-      font-size: 32px;
-    }
+.subtitle{
+  text-align:center;
+  color:#777;
+  margin:10px 0 25px;
+}
 
-    .subtitle {
-      text-align: center;
-      color: #777;
-      margin: 10px 0 28px;
-    }
+.card{
+  background:white;
+  padding:20px;
+  border-radius:22px;
+  box-shadow:0 8px 30px rgba(0,0,0,.08);
+}
 
-    .card {
-      background: white;
-      border-radius: 22px;
-      padding: 22px;
-      box-shadow: 0 8px 30px rgba(0,0,0,.08);
-    }
+.title{
+  display:block;
+  font-weight:bold;
+  margin-bottom:8px;
+}
 
-    .title {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
+#packName{
+  width:100%;
+  padding:14px;
+  border:1px solid #ddd;
+  border-radius:12px;
+  font-size:16px;
+  margin-bottom:18px;
+}
 
-    #packName {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      font-size: 16px;
-      margin-bottom: 20px;
-      outline: none;
-    }
+.upload{
+  position:relative;
+  min-height:150px;
+  border:2px dashed #aaa;
+  border-radius:18px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  cursor:pointer;
+  overflow:hidden;
+}
 
-    #packName:focus {
-      border-color: #777;
-    }
+.upload strong{
+  font-size:20px;
+  margin-bottom:8px;
+}
 
-    .upload {
-      position: relative;
-      min-height: 155px;
-      border: 2px dashed #aaa;
-      border-radius: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      text-align: center;
-      cursor: pointer;
-      overflow: hidden;
-      transition: .2s;
-    }
+.upload span{
+  color:#777;
+}
 
-    .upload:active {
-      transform: scale(.98);
-    }
+#fileInput{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  opacity:0;
+}
 
-    .upload strong {
-      font-size: 20px;
-      margin-bottom: 8px;
-    }
+.count{
+  text-align:center;
+  font-weight:bold;
+  margin:15px 0;
+}
 
-    .upload span {
-      color: #777;
-      font-size: 14px;
-    }
+.preview{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
 
-    #fileInput {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      cursor: pointer;
-    }
+.preview-item{
+  aspect-ratio:1;
+  border-radius:14px;
+  overflow:hidden;
+  background:#eee;
+}
 
-    .count {
-      text-align: center;
-      font-weight: bold;
-      margin-top: 16px;
-    }
+.preview-item img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
 
-    .preview {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
-      gap: 10px;
-      margin-top: 18px;
-    }
+button{
+  width:100%;
+  padding:15px;
+  border:0;
+  border-radius:13px;
+  margin-top:12px;
+  font-size:17px;
+  font-weight:bold;
+  cursor:pointer;
+}
 
-    .preview-item {
-      position: relative;
-      aspect-ratio: 1;
-      border-radius: 14px;
-      overflow: hidden;
-      background:
-        linear-gradient(45deg, #eee 25%, transparent 25%),
-        linear-gradient(-45deg, #eee 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, #eee 75%),
-        linear-gradient(-45deg, transparent 75%, #eee 75%);
-      background-size: 20px 20px;
-      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
-    }
+#convertBtn{
+  background:#222;
+  color:white;
+}
 
-    .preview-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
+button:disabled{
+  opacity:.45;
+}
 
-    .number {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      min-width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: rgba(0,0,0,.7);
-      color: white;
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+.status{
+  text-align:center;
+  margin-top:15px;
+  font-weight:bold;
+  line-height:1.6;
+}
 
-    button {
-      width: 100%;
-      border: none;
-      border-radius: 13px;
-      padding: 15px;
-      font-size: 17px;
-      font-weight: bold;
-      margin-top: 12px;
-      cursor: pointer;
-    }
+/* =========================
+   الملصقات الناتجة
+========================= */
 
-    #convertBtn {
-      background: #222;
-      color: white;
-    }
+#resultSection{
+  display:none;
+  margin-top:25px;
+}
 
-    #downloadBtn {
-      background: #25d366;
-      color: white;
-    }
+.resultTitle{
+  font-size:21px;
+  font-weight:bold;
+  margin-bottom:12px;
+}
 
-    #shareBtn {
-      background: #1677ff;
-      color: white;
-    }
+.stickers{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
 
-    button:disabled {
-      opacity: .45;
-      cursor: not-allowed;
-    }
+.sticker{
+  background:#f2f2f2;
+  border-radius:16px;
+  padding:8px;
+  text-align:center;
+}
 
-    .status {
-      text-align: center;
-      margin-top: 18px;
-      font-weight: bold;
-      line-height: 1.6;
-    }
+.sticker img{
+  width:100%;
+  aspect-ratio:1;
+  object-fit:contain;
+  display:block;
+  border-radius:10px;
+}
 
-    .info {
-      margin-top: 20px;
-      padding: 15px;
-      background: #f7f7f7;
-      border-radius: 14px;
-      color: #666;
-      line-height: 1.7;
-      font-size: 14px;
-    }
+.sticker button{
+  margin-top:8px;
+  padding:10px;
+  font-size:14px;
+  background:#1677ff;
+  color:white;
+}
 
-    .warning {
-      margin-top: 12px;
-      padding: 13px;
-      background: #fff8e1;
-      border-radius: 12px;
-      color: #765900;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-  </style>
+.size{
+  font-size:11px;
+  color:#777;
+  margin-top:5px;
+}
+
+.info{
+  margin-top:20px;
+  padding:14px;
+  border-radius:13px;
+  background:#f7f7f7;
+  color:#666;
+  font-size:13px;
+  line-height:1.7;
+}
+</style>
 </head>
 
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <h1>𝘔𝘐𝘒𝘜 𝘚𝘛𝘐𝘊𝘒𝘌𝘙𝘚</h1>
+<h1>𝘔𝘐𝘒𝘜 𝘚𝘛𝘐𝘊𝘒𝘌𝘙𝘚</h1>
 
-    <div class="subtitle">
-      حوّل صورك إلى ملصقات واتساب 🎀
-    </div>
+<div class="subtitle">
+حوّل صورك إلى ملصقات 🎀
+</div>
 
-    <div class="card">
+<div class="card">
 
-      <label class="title" for="packName">
-        اسم حزمة الملصقات
-      </label>
+<label class="title">
+اسم حزمة الملصقات
+</label>
 
-      <input
-        id="packName"
-        type="text"
-        placeholder="مثلاً: Miku Stickers"
-        maxlength="40"
-      >
+<input
+id="packName"
+type="text"
+placeholder="مثلاً: Miku Stickers"
+maxlength="40"
+>
 
-      <label class="upload">
+<label class="upload">
 
-        <input
-          id="fileInput"
-          type="file"
-          accept="image/*"
-          multiple
-        >
+<input
+id="fileInput"
+type="file"
+accept="image/*"
+multiple
+>
 
-        <strong>🖼️ اختر الصور</strong>
+<strong>🖼️ اختر الصور</strong>
 
-        <span>
-          اختر من 3 إلى 30 صورة
-        </span>
+<span>
+من 3 إلى 30 صورة
+</span>
 
-      </label>
+</label>
 
-      <div id="count" class="count"></div>
+<div
+id="count"
+class="count">
+</div>
 
-      <div id="preview" class="preview"></div>
+<div
+id="preview"
+class="preview">
+</div>
 
-      <button id="convertBtn" disabled>
-        ⚙️ تحويل إلى ملصقات
-      </button>
+<button
+id="convertBtn"
+disabled>
+⚙️ تحويل إلى ملصقات
+</button>
 
-      <button id="downloadBtn" disabled>
-        📦 تحميل الملصقات ZIP
-      </button>
+<div
+id="status"
+class="status">
+</div>
 
-      <button id="shareBtn" disabled>
-        📤 مشاركة الملصقات
-      </button>
 
-      <div id="status" class="status"></div>
+<div
+id="resultSection">
 
-      <div class="info">
-        الملصقات يتم تحويلها إلى 512×512 WebP
-        مع خلفية شفافة، مع محاولة ضغط كل ملصق
-        إلى أقل من 100KB.
-      </div>
+<div class="resultTitle">
+🎀 ملصقاتك الجاهزة
+</div>
 
-      <div class="warning">
-        ملاحظة: ملف ZIP هو ملف للصور المحوّلة،
-        وليس ملفًا سحريًا يستورده واتساب مباشرة.
-        واتساب يتيح حاليًا إنشاء وإدارة حزم الملصقات
-        من داخل التطبيق.
-      </div>
+<div
+id="stickers"
+class="stickers">
+</div>
 
-    </div>
+</div>
 
-  </div>
+
+<div class="info">
+
+كل ملصق يتم تحويله إلى
+512×512 WebP.
+
+بعد ظهور الملصقات اضغط على
+<strong>مشاركة</strong> لكل ملصق
+واحفظه أو أرسله إلى المكان الذي تريده.
+
+</div>
+
+</div>
+
+</div>
 
 
 <script>
 
 const fileInput =
-  document.getElementById("fileInput");
+document.getElementById("fileInput");
 
 const preview =
-  document.getElementById("preview");
+document.getElementById("preview");
 
 const count =
-  document.getElementById("count");
+document.getElementById("count");
 
 const convertBtn =
-  document.getElementById("convertBtn");
-
-const downloadBtn =
-  document.getElementById("downloadBtn");
-
-const shareBtn =
-  document.getElementById("shareBtn");
+document.getElementById("convertBtn");
 
 const status =
-  document.getElementById("status");
+document.getElementById("status");
+
+const resultSection =
+document.getElementById("resultSection");
+
+const stickersContainer =
+document.getElementById("stickers");
 
 let files = [];
 let stickers = [];
 
 
-/* =========================================
+/* =========================
    اختيار الصور
-========================================= */
+========================= */
 
-fileInput.addEventListener("change", () => {
+fileInput.addEventListener(
+"change",
+function(){
 
-  stickers = [];
+let selected =
+Array.from(
+fileInput.files || []
+);
 
-  let selected =
-    Array.from(fileInput.files || []);
+selected =
+selected.filter(
+file =>
+file.type.startsWith("image/")
+);
 
-  selected =
-    selected.filter(file =>
-      file.type.startsWith("image/")
-    );
+if(selected.length > 30){
 
-  if (selected.length > 30) {
-    selected = selected.slice(0, 30);
-  }
+selected =
+selected.slice(0,30);
 
-  files = selected;
+}
 
-  preview.innerHTML = "";
+files = selected;
 
-  downloadBtn.disabled = true;
-  shareBtn.disabled = true;
+preview.innerHTML = "";
 
+stickersContainer.innerHTML = "";
 
-  if (files.length === 0) {
-
-    count.textContent = "";
-
-    convertBtn.disabled = true;
-
-    return;
-  }
+resultSection.style.display =
+"none";
 
 
-  count.textContent =
-    `تم اختيار ${files.length} صورة`;
+if(files.length === 0){
+
+count.textContent = "";
+
+convertBtn.disabled = true;
+
+return;
+
+}
 
 
-  if (files.length < 3) {
-
-    count.textContent +=
-      " — تحتاج 3 صور على الأقل";
-
-    convertBtn.disabled = true;
-
-  } else {
-
-    convertBtn.disabled = false;
-
-  }
+count.textContent =
+`تم اختيار ${files.length} صورة`;
 
 
-  files.forEach((file, index) => {
+if(files.length < 3){
 
-    const item =
-      document.createElement("div");
+count.textContent +=
+" — اختر 3 صور على الأقل";
 
-    item.className =
-      "preview-item";
+convertBtn.disabled = true;
 
+}else{
 
-    const img =
-      document.createElement("img");
+convertBtn.disabled = false;
 
-    const url =
-      URL.createObjectURL(file);
-
-    img.src = url;
-
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-    };
+}
 
 
-    const number =
-      document.createElement("div");
+files.forEach(
+(file,index)=>{
 
-    number.className =
-      "number";
+const item =
+document.createElement("div");
 
-    number.textContent =
-      index + 1;
+item.className =
+"preview-item";
 
 
-    item.appendChild(img);
-    item.appendChild(number);
+const img =
+document.createElement("img");
 
-    preview.appendChild(item);
+const url =
+URL.createObjectURL(file);
 
-  });
+img.src = url;
 
-  status.textContent = "";
+img.onload = () => {
+
+URL.revokeObjectURL(url);
+
+};
+
+
+item.appendChild(img);
+
+preview.appendChild(item);
+
+});
 
 });
 
 
-/* =========================================
-   إنشاء WebP بجودة معينة
-========================================= */
+/* =========================
+   تحويل الصورة
+========================= */
 
-async function canvasToWebP(canvas, quality) {
+async function makeSticker(file){
 
-  return new Promise(resolve => {
+const image =
+await createImageBitmap(file);
 
-    canvas.toBlob(
-      blob => resolve(blob),
-      "image/webp",
-      quality
-    );
+const canvas =
+document.createElement("canvas");
 
-  });
+canvas.width = 512;
+canvas.height = 512;
+
+const ctx =
+canvas.getContext("2d");
+
+ctx.clearRect(
+0,
+0,
+512,
+512
+);
+
+
+const scale =
+Math.min(
+512 / image.width,
+512 / image.height
+);
+
+const width =
+image.width * scale;
+
+const height =
+image.height * scale;
+
+const x =
+(512 - width) / 2;
+
+const y =
+(512 - height) / 2;
+
+
+ctx.drawImage(
+image,
+x,
+y,
+width,
+height
+);
+
+image.close();
+
+
+/*
+  نحاول ضغط الملف
+  ليكون مناسبًا للملصقات.
+*/
+
+const qualities = [
+0.90,
+0.82,
+0.75,
+0.68,
+0.60,
+0.52,
+0.45,
+0.38
+];
+
+let blob;
+
+for(
+const quality of qualities
+){
+
+blob =
+await new Promise(
+resolve => {
+
+canvas.toBlob(
+result =>
+resolve(result),
+"image/webp",
+quality
+);
+
+});
+
+if(
+blob.size <=
+100 * 1024
+){
+
+break;
+
+}
 
 }
 
 
-/* =========================================
-   تحويل وضغط الملصق
-========================================= */
-
-async function makeSticker(file) {
-
-  const image =
-    await createImageBitmap(file);
-
-
-  const canvas =
-    document.createElement("canvas");
-
-  canvas.width = 512;
-  canvas.height = 512;
-
-
-  const ctx =
-    canvas.getContext("2d");
-
-
-  ctx.clearRect(
-    0,
-    0,
-    512,
-    512
-  );
-
-
-  const scale =
-    Math.min(
-      512 / image.width,
-      512 / image.height
-    );
-
-
-  const width =
-    image.width * scale;
-
-  const height =
-    image.height * scale;
-
-
-  const x =
-    (512 - width) / 2;
-
-  const y =
-    (512 - height) / 2;
-
-
-  ctx.drawImage(
-    image,
-    x,
-    y,
-    width,
-    height
-  );
-
-
-  image.close();
-
-
-  /*
-    نحاول أولاً بجودة عالية،
-    وإذا كان الملف أكبر من 100KB
-    نقلل الجودة تدريجيًا.
-  */
-
-  const qualities = [
-    0.90,
-    0.82,
-    0.75,
-    0.68,
-    0.60,
-    0.52,
-    0.45,
-    0.38
-  ];
-
-
-  let blob = null;
-
-
-  for (const quality of qualities) {
-
-    blob =
-      await canvasToWebP(
-        canvas,
-        quality
-      );
-
-
-    if (blob.size <= 100 * 1024) {
-      break;
-    }
-
-  }
-
-
-  return blob;
+return blob;
 
 }
 
 
-/* =========================================
-   تحويل جميع الصور
-========================================= */
+/* =========================
+   مشاركة ملصق
+========================= */
+
+async function shareSticker(
+sticker,
+index
+){
+
+const file =
+new File(
+[sticker.blob],
+sticker.name,
+{
+type:"image/webp"
+}
+);
+
+
+try{
+
+if(
+navigator.share &&
+navigator.canShare &&
+navigator.canShare({
+files:[file]
+})
+){
+
+await navigator.share({
+
+title:
+`Sticker ${index + 1}`,
+
+files:[file]
+
+});
+
+}else{
+
+/*
+  إذا المشاركة غير مدعومة،
+  ننزله مباشرة.
+*/
+
+const url =
+URL.createObjectURL(
+sticker.blob
+);
+
+const link =
+document.createElement("a");
+
+link.href = url;
+
+link.download =
+sticker.name;
+
+document.body.appendChild(link);
+
+link.click();
+
+link.remove();
+
+setTimeout(
+()=>{
+URL.revokeObjectURL(url);
+},
+2000
+);
+
+}
+
+}catch(error){
+
+if(
+error.name !==
+"AbortError"
+){
+
+console.error(error);
+
+}
+
+}
+
+}
+
+
+/* =========================
+   عرض الملصقات
+========================= */
+
+function showStickers(){
+
+stickersContainer.innerHTML = "";
+
+resultSection.style.display =
+"block";
+
+
+stickers.forEach(
+(sticker,index)=>{
+
+const box =
+document.createElement("div");
+
+box.className =
+"sticker";
+
+
+const img =
+document.createElement("img");
+
+const url =
+URL.createObjectURL(
+sticker.blob
+);
+
+img.src = url;
+
+
+const shareButton =
+document.createElement("button");
+
+shareButton.textContent =
+"📤 مشاركة";
+
+
+shareButton.addEventListener(
+"click",
+()=>{
+shareSticker(
+sticker,
+index
+);
+});
+
+
+const size =
+document.createElement("div");
+
+size.className =
+"size";
+
+size.textContent =
+`${(sticker.blob.size / 1024).toFixed(1)} KB`;
+
+
+box.appendChild(img);
+
+box.appendChild(
+shareButton
+);
+
+box.appendChild(size);
+
+stickersContainer.appendChild(
+box
+);
+
+});
+
+}
+
+
+/* =========================
+   تحويل كل الصور
+========================= */
 
 convertBtn.addEventListener(
-  "click",
-  async () => {
+"click",
+async function(){
 
-    if (files.length < 3) {
-      return;
-    }
-
-
-    convertBtn.disabled = true;
-    downloadBtn.disabled = true;
-    shareBtn.disabled = true;
+if(files.length < 3){
+return;
+}
 
 
-    stickers = [];
+convertBtn.disabled = true;
+
+stickers = [];
+
+stickersContainer.innerHTML = "";
+
+resultSection.style.display =
+"none";
 
 
-    try {
+try{
 
-      for (
-        let i = 0;
-        i < files.length;
-        i++
-      ) {
+for(
+let i = 0;
+i < files.length;
+i++
+){
 
-        status.textContent =
-          `جاري تحويل الملصق ${i + 1} من ${files.length}...`;
-
-
-        const blob =
-          await makeSticker(files[i]);
+status.textContent =
+`جاري تحويل الملصق ${i + 1} من ${files.length}...`;
 
 
-        stickers.push({
-          name:
-            `sticker_${String(i + 1).padStart(2, "0")}.webp`,
-
-          blob:
-            blob
-        });
-
-      }
-
-
-      const overLimit =
-        stickers.filter(
-          sticker =>
-            sticker.blob.size >
-            100 * 1024
-        );
-
-
-      if (overLimit.length > 0) {
-
-        status.textContent =
-          `تم التحويل، لكن ${overLimit.length} ملصق تجاوز 100KB.`;
-
-      } else {
-
-        status.textContent =
-          "تم تحويل جميع الملصقات بنجاح 🎀";
-
-      }
-
-
-      downloadBtn.disabled = false;
-
-      shareBtn.disabled = false;
-
-
-    } catch (error) {
-
-      console.error(error);
-
-      status.textContent =
-        "حدث خطأ أثناء تحويل الصور.";
-
-    }
-
-
-    convertBtn.disabled = false;
-
-  }
+const blob =
+await makeSticker(
+files[i]
 );
 
 
-/* =========================================
-   إنشاء ZIP
-========================================= */
+stickers.push({
 
-async function createZip() {
+name:
+`sticker_${String(i + 1).padStart(2,"0")}.webp`,
 
-  const packName =
-    document
-      .getElementById("packName")
-      .value
-      .trim() ||
-    "Miku Stickers";
+blob:
+blob
 
-
-  const zip =
-    new JSZip();
-
-
-  /*
-    مجلد الملصقات
-  */
-
-  const folder =
-    zip.folder(
-      packName.replace(
-        /[\\/:*?"<>|]/g,
-        "_"
-      )
-    );
-
-
-  stickers.forEach(sticker => {
-
-    folder.file(
-      sticker.name,
-      sticker.blob
-    );
-
-  });
-
-
-  /*
-    ملف معلومات بسيط
-  */
-
-  folder.file(
-    "README.txt",
-    `𝘔𝘐𝘒𝘜 𝘚𝘛𝘐𝘊𝘒𝘌𝘙𝘚
-
-Pack: ${packName}
-
-Number of stickers: ${stickers.length}
-
-Sticker size: 512x512
-Format: WebP
-`
-  );
-
-
-  return await zip.generateAsync({
-    type: "blob"
-  });
+});
 
 }
 
 
-/* =========================================
-   تحميل ZIP
-========================================= */
+status.textContent =
+"تم تحويل جميع الملصقات 🎀";
 
-downloadBtn.addEventListener(
-  "click",
-  async () => {
 
-    if (!stickers.length) {
-      return;
-    }
+showStickers();
 
 
-    try {
+}catch(error){
 
-      status.textContent =
-        "جاري تجهيز ملف ZIP...";
+console.error(error);
 
-
-      const blob =
-        await createZip();
-
-
-      const url =
-        URL.createObjectURL(blob);
-
-
-      const link =
-        document.createElement("a");
-
-
-      link.href = url;
-
-      link.download =
-        (
-          document
-            .getElementById("packName")
-            .value
-            .trim() ||
-          "Miku Stickers"
-        ).replace(
-          /[\\/:*?"<>|]/g,
-          "_"
-        ) + ".zip";
-
-
-      document.body.appendChild(link);
-
-      link.click();
-
-      link.remove();
-
-
-      setTimeout(() => {
-        URL.revokeObjectURL(url);
-      }, 3000);
-
-
-      status.textContent =
-        "تم تحميل حزمة الملصقات 📦";
-
-
-    } catch (error) {
-
-      console.error(error);
-
-      status.textContent =
-        "حدث خطأ أثناء إنشاء الملف.";
-
-    }
-
-  }
-);
-
-
-/* =========================================
-   مشاركة ZIP
-========================================= */
-
-shareBtn.addEventListener(
-  "click",
-  async () => {
-
-    if (!stickers.length) {
-      return;
-    }
-
-
-    try {
-
-      status.textContent =
-        "جاري تجهيز الملف للمشاركة...";
-
-
-      const blob =
-        await createZip();
-
-
-      const packName =
-        (
-          document
-            .getElementById("packName")
-            .value
-            .trim() ||
-          "Miku Stickers"
-        ).replace(
-          /[\\/:*?"<>|]/g,
-          "_"
-        );
-
-
-      const file =
-        new File(
-          [blob],
-          `${packName}.zip`,
-          {
-            type:
-              "application/zip"
-          }
-        );
-
-
-      /*
-        نتأكد أن الجهاز يدعم
-        المشاركة بالملفات.
-      */
-
-      if (
-        navigator.share &&
-        (!navigator.canShare ||
-         navigator.canShare({
-           files: [file]
-         }))
-      ) {
-
-        await navigator.share({
-          title:
-            packName,
-
-          text:
-            "حزمة ملصقات من 𝘔𝘐𝘒𝘜 𝘚𝘛𝘐𝘊𝘒𝘌𝘙𝘚",
-
-          files: [file]
-        });
-
-
-        status.textContent =
-          "تم فتح قائمة المشاركة 📤";
-
-
-      } else {
-
-        status.textContent =
-          "المشاركة بالملفات غير مدعومة في هذا المتصفح. استخدم زر التحميل.";
-
-      }
-
-
-    } catch (error) {
-
-      console.error(error);
-
-
-      if (
-        error.name ===
-        "AbortError"
-      ) {
-
-        status.textContent =
-          "تم إلغاء المشاركة.";
-
-      } else {
-
-        status.textContent =
-          "تعذر مشاركة الملف.";
-
-      }
-
-    }
-
-  }
-);
-
-
-/* =========================================
-   إخفاء زر المشاركة إذا غير مدعوم
-========================================= */
-
-if (!navigator.share) {
-
-  shareBtn.style.display =
-    "none";
+status.textContent =
+"حدث خطأ أثناء التحويل.";
 
 }
+
+
+convertBtn.disabled = false;
+
+});
 
 </script>
 
