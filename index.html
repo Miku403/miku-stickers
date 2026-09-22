@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
 
 <meta charset="UTF-8">
@@ -21,137 +22,83 @@
 
 body{
   margin:0;
+  font-family:Arial,sans-serif;
   background:#f5f5f5;
   color:#222;
-  font-family:Arial,sans-serif;
 }
 
 .container{
-  width:min(900px,92%);
-  margin:30px auto;
+  max-width:900px;
+  margin:auto;
+  padding:25px 15px;
 }
 
 h1{
   text-align:center;
-  font-size:32px;
-  margin:0;
-}
-
-.subtitle{
-  text-align:center;
-  color:#777;
-  margin:10px 0 25px;
+  margin-bottom:25px;
 }
 
 .card{
   background:white;
+  border-radius:18px;
   padding:20px;
-  border-radius:22px;
-  box-shadow:0 8px 30px rgba(0,0,0,.08);
+  margin-bottom:20px;
+  box-shadow:0 5px 20px rgba(0,0,0,.08);
 }
 
-.title{
+label{
   display:block;
-  font-weight:bold;
   margin-bottom:8px;
+  font-weight:bold;
 }
 
-#packName{
+input[type="text"]{
   width:100%;
-  padding:14px;
+  padding:13px;
   border:1px solid #ddd;
   border-radius:12px;
   font-size:16px;
-  margin-bottom:18px;
+  margin-bottom:15px;
 }
 
-.upload{
-  position:relative;
-  min-height:150px;
-  border:2px dashed #aaa;
-  border-radius:18px;
-
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-
-  text-align:center;
-  cursor:pointer;
-  overflow:hidden;
-}
-
-.upload strong{
-  font-size:20px;
-  margin-bottom:8px;
-}
-
-.upload span{
-  color:#777;
-}
-
-#fileInput{
-  position:absolute;
-  inset:0;
+input[type="file"]{
   width:100%;
-  height:100%;
-  opacity:0;
-  cursor:pointer;
-}
-
-.count{
-  text-align:center;
-  font-weight:bold;
-  margin:15px 0;
-}
-
-.preview{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-}
-
-.preview-item{
-  aspect-ratio:1;
-  border-radius:14px;
-  overflow:hidden;
-  background:#eee;
-}
-
-.preview-item img{
-  width:100%;
-  height:100%;
-  object-fit:contain;
+  margin-bottom:15px;
 }
 
 button{
   width:100%;
-  padding:15px;
   border:0;
-  border-radius:13px;
-  margin-top:12px;
-  font-size:17px;
+  border-radius:12px;
+  padding:14px;
+  font-size:16px;
   font-weight:bold;
   cursor:pointer;
+  margin-top:10px;
 }
 
 button:disabled{
-  opacity:.45;
+  opacity:.5;
   cursor:not-allowed;
 }
 
 #convertBtn{
-  background:#222;
-  color:white;
-}
-
-#directBtn{
-  background:#25D366;
+  background:#111;
   color:white;
 }
 
 #packBtn{
-  background:#16883b;
+  background:#25d366;
+  color:white;
+}
+
+#directBtn{
+  background:#128c7e;
+  color:white;
+}
+
+#shareBtn{
+  background:#444;
   color:white;
 }
 
@@ -162,26 +109,17 @@ button:disabled{
   line-height:1.7;
 }
 
-#resultSection{
-  display:none;
-  margin-top:25px;
-}
-
-.resultTitle{
-  font-size:21px;
-  font-weight:bold;
-  margin-bottom:12px;
-}
-
-.stickers{
+.preview{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:
+    repeat(auto-fill,minmax(110px,1fr));
   gap:12px;
+  margin-top:15px;
 }
 
 .sticker{
-  background:#f2f2f2;
-  border-radius:16px;
+  background:#fafafa;
+  border-radius:12px;
   padding:8px;
   text-align:center;
 }
@@ -190,51 +128,28 @@ button:disabled{
   width:100%;
   aspect-ratio:1;
   object-fit:contain;
-  display:block;
   border-radius:10px;
 }
 
 .sticker button{
-  margin-top:8px;
-  padding:10px;
-  font-size:14px;
-  background:#1677ff;
+  background:#333;
   color:white;
+  font-size:13px;
+  padding:9px;
 }
 
-.size{
-  font-size:11px;
+.small{
+  font-size:13px;
   color:#777;
-  margin-top:5px;
+  line-height:1.6;
 }
 
-.info{
-  margin-top:20px;
-  padding:14px;
-  border-radius:13px;
-  background:#f7f7f7;
-  color:#666;
-  font-size:13px;
-  line-height:1.7;
-}
-
-.packInfo{
-  margin-top:15px;
-  padding:14px;
-  border-radius:13px;
-  background:#eefaf1;
-  color:#276438;
-  font-size:13px;
-  line-height:1.7;
-}
-
-.experimental{
-  margin-top:10px;
+.warning{
+  background:#fff7d6;
   padding:12px;
   border-radius:12px;
-  background:#fff8df;
-  color:#765d00;
-  font-size:12px;
+  margin-top:12px;
+  font-size:13px;
   line-height:1.7;
 }
 
@@ -246,28 +161,25 @@ button:disabled{
 
 <div class="container">
 
-<h1>
-𝘔𝘐𝘒𝘜 𝘚𝘛𝘐𝘊𝘒𝘌𝘙𝘚
-</h1>
+<h1>𝘔𝘐𝘒𝘜 𝘚𝘛𝘐𝘊𝘒𝘌𝘙𝘚</h1>
 
-<div class="subtitle">
-حوّل صورك إلى ملصقات 🎀
-</div>
 
 <div class="card">
 
-<label class="title">
+<label>
 اسم حزمة الملصقات
 </label>
 
 <input
   id="packName"
   type="text"
-  placeholder="مثلاً: Miku Stickers"
-  maxlength="128"
+  placeholder="Miku Stickers"
 >
 
-<label class="upload">
+
+<label>
+اختر من 3 إلى 30 صورة
+</label>
 
 <input
   id="fileInput"
@@ -276,110 +188,62 @@ button:disabled{
   multiple
 >
 
-<strong>
-🖼️ اختر الصور
-</strong>
-
-<span>
-من 3 إلى 30 صورة
-</span>
-
-</label>
-
-<div id="count" class="count"></div>
-
-<div id="preview" class="preview"></div>
 
 <button
   id="convertBtn"
-  disabled
 >
-⚙️ تحويل إلى ملصقات
+تحويل الملصقات
 </button>
+
+<div
+  id="status"
+  class="status"
+>
+جاهز
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>
+المعاينة
+</h3>
+
+<div
+  id="preview"
+  class="preview"
+></div>
+
+</div>
+
+
+<div class="card">
 
 <button
   id="directBtn"
   disabled
 >
-🧪 تجربة الإضافة المباشرة إلى WhatsApp
+🧪 تجربة إرسال الحزمة مباشرة إلى WhatsApp
 </button>
 
 <button
   id="packBtn"
   disabled
 >
-📦 إنشاء حزمة .wastickers
+📦 تحميل حزمة .wastickers
 </button>
 
-<div id="status" class="status"></div>
+<p class="small">
+التجربة المباشرة تحاول وضع بيانات حزمة WhatsApp
+في Web Clipboard ثم فتح WhatsApp.
+</p>
 
-<div id="resultSection">
+<div class="warning">
 
-<div class="resultTitle">
-🎀 ملصقاتك الجاهزة
-</div>
-
-<div
-  id="stickers"
-  class="stickers">
-</div>
-
-<div class="packInfo">
-
-الحزمة تحتوي على:
-
-<br>
-
-• جميع الملصقات 512×512 بالضبط
-
-<br>
-
-• WebP
-
-<br>
-
-• حجم مستهدف أقل من 100KB
-
-<br>
-
-• غلاف PNG بحجم 96×96
-
-<br>
-
-• اسم الحزمة
-
-<br>
-
-• اسم الناشر
-
-</div>
-
-<div class="experimental">
-
-🧪 زر الإضافة المباشرة تجريبي.
-
-الموقع سيجهز بيانات الحزمة بصيغة قريبة من بنية WhatsApp الرسمية ويحاول فتح
-WhatsApp.
-
-إذا رفض Safari الوصول إلى آلية Pasteboard الخاصة بواتساب، فلن تتم الإضافة المباشرة من المتصفح.
-
-</div>
-
-</div>
-
-<div class="info">
-
-كل ملصق يتم تحويله إلى
-<strong>512×512</strong>
-بكسل بالضبط.
-
-إذا كان حجم الملف أقل من
-<strong>100KB</strong>
-فلن يتم ضغطه.
-
-إذا كان أكبر من ذلك، يتم تقليل
-<strong>الجودة فقط</strong>
-مع الحفاظ على أبعاد 512×512.
+⚠️ إذا رفض Chrome نوع البيانات المخصص،
+سيظهر سبب الرفض بدل اعتبار العملية ناجحة.
 
 </div>
 
@@ -390,39 +254,26 @@ WhatsApp.
 
 <script>
 
-/* =========================
-   العناصر
-========================= */
-
 const fileInput =
-document.getElementById("fileInput");
-
-const packName =
-document.getElementById("packName");
-
-const preview =
-document.getElementById("preview");
-
-const count =
-document.getElementById("count");
+  document.getElementById("fileInput");
 
 const convertBtn =
-document.getElementById("convertBtn");
-
-const directBtn =
-document.getElementById("directBtn");
+  document.getElementById("convertBtn");
 
 const packBtn =
-document.getElementById("packBtn");
+  document.getElementById("packBtn");
+
+const directBtn =
+  document.getElementById("directBtn");
+
+const preview =
+  document.getElementById("preview");
 
 const status =
-document.getElementById("status");
+  document.getElementById("status");
 
-const resultSection =
-document.getElementById("resultSection");
-
-const stickersContainer =
-document.getElementById("stickers");
+const packName =
+  document.getElementById("packName");
 
 
 let files = [];
@@ -431,361 +282,204 @@ let stickers = [];
 
 
 /* =========================
-   اختيار الصور
+   تحويل الصورة إلى 512x512
 ========================= */
 
-fileInput.addEventListener(
-"change",
-function(){
+async function makeSticker(file){
 
-let selected =
-Array.from(
-fileInput.files || []
-);
+  const image =
+    await createImageBitmap(file);
 
-selected =
-selected.filter(
-file =>
-file.type.startsWith("image/")
-);
+  const MAX_SIZE =
+    100 * 1024;
 
-if(selected.length > 30){
+  const canvas =
+    document.createElement("canvas");
 
-selected =
-selected.slice(0,30);
+  canvas.width = 512;
+  canvas.height = 512;
 
-}
+  const ctx =
+    canvas.getContext("2d");
 
-files = selected;
+  ctx.clearRect(
+    0,
+    0,
+    512,
+    512
+  );
 
-preview.innerHTML = "";
+  const margin = 16;
 
-stickersContainer.innerHTML = "";
+  const available =
+    512 - (margin * 2);
 
-resultSection.style.display =
-"none";
+  const scale =
+    Math.min(
+      available / image.width,
+      available / image.height
+    );
 
-directBtn.disabled = true;
+  const width =
+    image.width * scale;
 
-packBtn.disabled = true;
+  const height =
+    image.height * scale;
 
-status.textContent = "";
+  const x =
+    (512 - width) / 2;
 
+  const y =
+    (512 - height) / 2;
 
-if(files.length === 0){
+  ctx.drawImage(
+    image,
+    x,
+    y,
+    width,
+    height
+  );
 
-count.textContent = "";
+  image.close();
 
-convertBtn.disabled = true;
 
-return;
+  function convert(quality){
 
-}
+    return new Promise(resolve => {
 
+      canvas.toBlob(
+        blob => resolve(blob),
+        "image/webp",
+        quality
+      );
 
-count.textContent =
-`تم اختيار ${files.length} صورة`;
+    });
 
+  }
 
-if(files.length < 3){
 
-count.textContent +=
-" — اختر 3 صور على الأقل";
+  let blob =
+    await convert(.92);
 
-convertBtn.disabled = true;
 
-}else{
+  if(blob.size <= MAX_SIZE){
 
-convertBtn.disabled = false;
+    return blob;
 
-}
+  }
 
 
-files.forEach(
-file => {
+  let low = .05;
 
-const item =
-document.createElement("div");
+  let high = .90;
 
-item.className =
-"preview-item";
+  let bestBlob = null;
 
 
-const img =
-document.createElement("img");
+  for(
+    let i = 0;
+    i < 12;
+    i++
+  ){
 
+    const quality =
+      (low + high) / 2;
 
-const url =
-URL.createObjectURL(file);
+    blob =
+      await convert(quality);
 
-img.src = url;
 
+    if(blob.size <= MAX_SIZE){
 
-img.onload = () => {
+      bestBlob = blob;
 
-URL.revokeObjectURL(url);
+      low = quality;
 
-};
+    }else{
 
+      high = quality;
 
-item.appendChild(img);
+    }
 
-preview.appendChild(item);
+  }
 
-});
 
-});
+  if(bestBlob){
 
+    return bestBlob;
 
-/* =========================
-   Canvas → WebP
-========================= */
+  }
 
-function canvasToWebP(
-canvas,
-quality
-){
 
-return new Promise(
-resolve => {
-
-canvas.toBlob(
-blob => resolve(blob),
-"image/webp",
-quality
-);
-
-});
-
-}
-
-
-/* =========================
-   تحويل الصورة
-   512×512 دائمًا
-========================= */
-
-async function makeSticker(
-file
-){
-
-const image =
-await createImageBitmap(file);
-
-const MAX_SIZE =
-100 * 1024;
-
-
-const canvas =
-document.createElement("canvas");
-
-canvas.width = 512;
-canvas.height = 512;
-
-
-const ctx =
-canvas.getContext("2d");
-
-
-ctx.clearRect(
-0,
-0,
-512,
-512
-);
-
-
-const margin = 16;
-
-const available =
-512 - (margin * 2);
-
-
-const scale =
-Math.min(
-available / image.width,
-available / image.height
-);
-
-
-const width =
-image.width * scale;
-
-const height =
-image.height * scale;
-
-
-const x =
-(512 - width) / 2;
-
-const y =
-(512 - height) / 2;
-
-
-ctx.drawImage(
-image,
-x,
-y,
-width,
-height
-);
-
-
-image.close();
-
-
-let blob =
-await canvasToWebP(
-canvas,
-0.92
-);
-
-
-if(
-blob &&
-blob.size <= MAX_SIZE
-){
-
-return blob;
-
-}
-
-
-let low = 0.01;
-
-let high = 0.90;
-
-let bestBlob = null;
-
-
-for(
-let i = 0;
-i < 14;
-i++
-){
-
-const quality =
-(low + high) / 2;
-
-
-blob =
-await canvasToWebP(
-canvas,
-quality
-);
-
-
-if(
-blob &&
-blob.size <= MAX_SIZE
-){
-
-bestBlob = blob;
-
-low = quality;
-
-}else{
-
-high = quality;
-
-}
-
-}
-
-
-if(bestBlob){
-
-return bestBlob;
-
-}
-
-
-blob =
-await canvasToWebP(
-canvas,
-0.01
-);
-
-
-return blob;
+  return await convert(.01);
 
 }
 
 
 /* =========================
-   إنشاء الغلاف
+   الغلاف 96x96 PNG
 ========================= */
 
-async function makeCover(
-file
-){
+async function makeCover(file){
 
-const image =
-await createImageBitmap(file);
+  const image =
+    await createImageBitmap(file);
 
+  const canvas =
+    document.createElement("canvas");
 
-const canvas =
-document.createElement("canvas");
+  canvas.width = 96;
+  canvas.height = 96;
 
-canvas.width = 96;
-canvas.height = 96;
+  const ctx =
+    canvas.getContext("2d");
 
-
-const ctx =
-canvas.getContext("2d");
-
-
-ctx.clearRect(
-0,
-0,
-96,
-96
-);
+  ctx.clearRect(
+    0,
+    0,
+    96,
+    96
+  );
 
 
-const scale =
-Math.min(
-96 / image.width,
-96 / image.height
-);
+  const scale =
+    Math.min(
+      96 / image.width,
+      96 / image.height
+    );
+
+  const width =
+    image.width * scale;
+
+  const height =
+    image.height * scale;
+
+  const x =
+    (96 - width) / 2;
+
+  const y =
+    (96 - height) / 2;
 
 
-const width =
-image.width * scale;
+  ctx.drawImage(
+    image,
+    x,
+    y,
+    width,
+    height
+  );
 
-const height =
-image.height * scale;
-
-
-const x =
-(96 - width) / 2;
-
-const y =
-(96 - height) / 2;
+  image.close();
 
 
-ctx.drawImage(
-image,
-x,
-y,
-width,
-height
-);
+  return new Promise(resolve => {
 
+    canvas.toBlob(
+      blob => resolve(blob),
+      "image/png"
+    );
 
-image.close();
-
-
-return new Promise(
-resolve => {
-
-canvas.toBlob(
-blob =>
-resolve(blob),
-"image/png"
-);
-
-});
+  });
 
 }
 
@@ -794,315 +488,378 @@ resolve(blob),
    Blob → Base64
 ========================= */
 
-function blobToBase64(
-blob
-){
+function blobToBase64(blob){
 
-return new Promise(
-(resolve,reject) => {
+  return new Promise(
+    (resolve,reject) => {
 
-const reader =
-new FileReader();
+      const reader =
+        new FileReader();
 
-reader.onloadend =
-() => {
+      reader.onloadend =
+        () => {
 
-const result =
-reader.result;
+          const result =
+            reader.result;
 
-const base64 =
-result.split(",")[1];
+          const base64 =
+            result.split(",")[1];
 
-resolve(base64);
+          resolve(base64);
 
-};
+        };
 
-reader.onerror =
-reject;
+      reader.onerror =
+        reject;
 
-reader.readAsDataURL(
-blob
-);
+      reader.readAsDataURL(blob);
 
-});
+    }
+  );
 
 }
 
 
 /* =========================
-   مشاركة ملصق منفرد
+   عرض المعاينة
 ========================= */
 
-async function shareSticker(
-sticker,
-index
-){
+function renderPreview(){
 
-const file =
-new File(
-[
-sticker.blob
-],
-sticker.name,
-{
-type:"image/webp"
-}
-);
+  preview.innerHTML = "";
 
 
-try{
+  stickers.forEach(
+    (sticker,index) => {
 
-if(
-navigator.share &&
-navigator.canShare &&
-navigator.canShare({
-files:[file]
-})
-){
+      const div =
+        document.createElement("div");
 
-await navigator.share({
-
-title:
-`Sticker ${index + 1}`,
-
-files:[
-file
-]
-
-});
-
-}else{
-
-const url =
-URL.createObjectURL(
-sticker.blob
-);
+      div.className =
+        "sticker";
 
 
-const link =
-document.createElement("a");
+      const img =
+        document.createElement("img");
 
-link.href = url;
-
-link.download =
-sticker.name;
-
-
-document.body.appendChild(
-link
-);
-
-link.click();
-
-link.remove();
+      img.src =
+        URL.createObjectURL(
+          sticker.blob
+        );
 
 
-setTimeout(
-() => {
+      const button =
+        document.createElement("button");
 
-URL.revokeObjectURL(
-url
-);
+      button.textContent =
+        "مشاركة";
 
-},
-2000
-);
 
-}
+      button.addEventListener(
+        "click",
+        async () => {
 
-}catch(error){
+          const file =
+            new File(
+              [sticker.blob],
+              `miku-${index + 1}.webp`,
+              {
+                type:"image/webp"
+              }
+            );
 
-if(
-error.name !==
-"AbortError"
-){
 
-console.error(error);
+          if(
+            navigator.share &&
+            navigator.canShare &&
+            navigator.canShare({
+              files:[file]
+            })
+          ){
 
-}
+            try{
 
-}
+              await navigator.share({
+                files:[file],
+                title:"Miku Sticker"
+              });
+
+            }catch(error){
+
+              console.log(error);
+
+            }
+
+          }else{
+
+            status.textContent =
+              "المشاركة غير مدعومة في هذا المتصفح.";
+
+          }
+
+        }
+      );
+
+
+      div.appendChild(img);
+
+      div.appendChild(button);
+
+      preview.appendChild(div);
+
+    }
+  );
 
 }
 
 
 /* =========================
-   عرض الملصقات
+   اختيار الصور
 ========================= */
 
-function showStickers(){
+fileInput.addEventListener(
+  "change",
+  () => {
 
-stickersContainer.innerHTML =
-"";
-
-resultSection.style.display =
-"block";
-
-
-stickers.forEach(
-(sticker,index) => {
-
-const box =
-document.createElement("div");
-
-box.className =
-"sticker";
+    files =
+      Array.from(
+        fileInput.files
+      );
 
 
-const img =
-document.createElement("img");
+    stickers = [];
+
+    preview.innerHTML = "";
 
 
-const url =
-URL.createObjectURL(
-sticker.blob
+    if(
+      files.length < 3 ||
+      files.length > 30
+    ){
+
+      status.textContent =
+        "❌ يجب اختيار من 3 إلى 30 صورة.";
+
+      return;
+
+    }
+
+
+    status.textContent =
+      `تم اختيار ${files.length} صورة.`;
+
+  }
 );
-
-img.src = url;
-
-
-const shareButton =
-document.createElement("button");
-
-shareButton.textContent =
-"📤 مشاركة";
-
-
-shareButton.addEventListener(
-"click",
-() => {
-
-shareSticker(
-sticker,
-index
-);
-
-});
-
-
-const size =
-document.createElement("div");
-
-size.className =
-"size";
-
-
-size.textContent =
-`${(
-sticker.blob.size / 1024
-).toFixed(1)} KB`;
-
-
-box.appendChild(img);
-
-box.appendChild(
-shareButton
-);
-
-box.appendChild(size);
-
-
-stickersContainer.appendChild(
-box
-);
-
-});
-
-}
 
 
 /* =========================
-   تحويل جميع الصور
+   التحويل
 ========================= */
 
 convertBtn.addEventListener(
-"click",
-async function(){
+  "click",
+  async () => {
 
-if(files.length < 3){
+    if(
+      files.length < 3 ||
+      files.length > 30
+    ){
 
-return;
+      status.textContent =
+        "❌ اختر من 3 إلى 30 صورة أولًا.";
 
-}
+      return;
 
-
-convertBtn.disabled = true;
-
-directBtn.disabled = true;
-
-packBtn.disabled = true;
-
-stickers = [];
-
-stickersContainer.innerHTML =
-"";
-
-resultSection.style.display =
-"none";
+    }
 
 
-try{
+    convertBtn.disabled = true;
 
-for(
-let i = 0;
-i < files.length;
-i++
-){
+    packBtn.disabled = true;
 
-status.textContent =
-`جاري تحويل الملصق ${i + 1} من ${files.length}...`;
+    directBtn.disabled = true;
 
 
-const blob =
-await makeSticker(
-files[i]
+    stickers = [];
+
+
+    try{
+
+      for(
+        let i = 0;
+        i < files.length;
+        i++
+      ){
+
+        status.textContent =
+          `⏳ تحويل الملصق ${i + 1} من ${files.length}...`;
+
+
+        const blob =
+          await makeSticker(
+            files[i]
+          );
+
+
+        stickers.push({
+          blob:blob
+        });
+
+      }
+
+
+      renderPreview();
+
+
+      packBtn.disabled = false;
+
+      directBtn.disabled = false;
+
+
+      status.textContent =
+        `✅ تم تحويل ${stickers.length} ملصق بنجاح — 512×512`;
+
+    }catch(error){
+
+      console.error(error);
+
+      status.textContent =
+        "❌ حدث خطأ: " +
+        error.message;
+
+    }
+
+
+    convertBtn.disabled = false;
+
+  }
 );
 
 
-stickers.push({
+/* =========================
+   إنشاء .wastickers
+========================= */
 
-name:
-`sticker_${String(
-i + 1
-).padStart(
-2,
-"0"
-)}.webp`,
+packBtn.addEventListener(
+  "click",
+  async () => {
 
-blob:
-blob
+    if(
+      stickers.length < 3
+    ){
 
-});
+      return;
 
-}
-
-
-status.textContent =
-"تم تحويل جميع الملصقات 🎀";
+    }
 
 
-showStickers();
+    packBtn.disabled = true;
+
+    directBtn.disabled = true;
 
 
-directBtn.disabled = false;
+    try{
 
-packBtn.disabled = false;
-
-
-}catch(error){
-
-console.error(error);
-
-status.textContent =
-"حدث خطأ أثناء التحويل: " +
-error.message;
-
-}
+      status.textContent =
+        "📦 تجهيز حزمة WhatsApp...";
 
 
-convertBtn.disabled = false;
+      const zip =
+        new JSZip();
 
-});
+
+      const name =
+        packName.value.trim() ||
+        "Miku Stickers";
+
+
+      const coverBlob =
+        await makeCover(
+          files[0]
+        );
+
+
+      zip.file(
+        "cover.png",
+        coverBlob
+      );
+
+
+      zip.file(
+        "title.txt",
+        name
+      );
+
+
+      zip.file(
+        "author.txt",
+        "Miku Stickers"
+      );
+
+
+      for(
+        let i = 0;
+        i < stickers.length;
+        i++
+      ){
+
+        zip.file(
+          `${String(i).padStart(2,"0")}.webp`,
+          stickers[i].blob
+        );
+
+      }
+
+
+      const blob =
+        await zip.generateAsync({
+          type:"blob"
+        });
+
+
+      const url =
+        URL.createObjectURL(blob);
+
+
+      const a =
+        document.createElement("a");
+
+      a.href = url;
+
+      a.download =
+        `${name}.wastickers`;
+
+      a.click();
+
+
+      setTimeout(
+        () => {
+          URL.revokeObjectURL(url);
+        },
+        1000
+      );
+
+
+      status.textContent =
+        "✅ تم إنشاء حزمة .wastickers.";
+
+    }catch(error){
+
+      console.error(error);
+
+      status.textContent =
+        "❌ خطأ في إنشاء الحزمة: " +
+        error.message;
+
+    }
+
+
+    packBtn.disabled = false;
+
+    directBtn.disabled = false;
+
+  }
+);
 
 
 /* =========================
@@ -1110,409 +867,224 @@ convertBtn.disabled = false;
 ========================= */
 
 directBtn.addEventListener(
-"click",
-async function(){
+  "click",
+  async () => {
 
-if(
-stickers.length < 3
-){
+    if(
+      stickers.length < 3
+    ){
 
-return;
+      return;
 
-}
-
-
-directBtn.disabled = true;
-
-packBtn.disabled = true;
+    }
 
 
-try{
+    directBtn.disabled = true;
 
-status.textContent =
-"🧪 تجهيز بيانات WhatsApp...";
+    packBtn.disabled = true;
 
 
-/*
-  إنشاء الغلاف PNG
-*/
+    try{
 
-const coverBlob =
-await makeCover(
-files[0]
+      status.textContent =
+        "🧪 تجهيز بيانات WhatsApp...";
+
+
+      const coverBlob =
+        await makeCover(
+          files[0]
+        );
+
+
+      const trayImage =
+        await blobToBase64(
+          coverBlob
+        );
+
+
+      const stickerArray = [];
+
+
+      for(
+        let i = 0;
+        i < stickers.length;
+        i++
+      ){
+
+        status.textContent =
+          `🧪 تجهيز الملصق ${i + 1} من ${stickers.length}...`;
+
+
+        const imageData =
+          await blobToBase64(
+            stickers[i].blob
+          );
+
+
+        stickerArray.push({
+
+          image_data:
+            imageData,
+
+          emojis:
+            ["🎀"],
+
+          accessibility_text:
+            `Miku sticker ${i + 1}`
+
+        });
+
+      }
+
+
+      const identifier =
+        "miku_stickers_" +
+        Date.now();
+
+
+      const whatsappPack = {
+
+        ios_app_store_link:
+          "",
+
+        android_play_store_link:
+          "",
+
+        identifier:
+          identifier,
+
+        name:
+          packName.value.trim() ||
+          "Miku Stickers",
+
+        publisher:
+          "Miku Stickers",
+
+        tray_image:
+          trayImage,
+
+        stickers:
+          stickerArray
+
+      };
+
+
+      const jsonText =
+        JSON.stringify(
+          whatsappPack
+        );
+
+
+      console.log(
+        "WhatsApp Sticker Pack:",
+        whatsappPack
+      );
+
+
+      console.log(
+        "JSON size:",
+        jsonText.length
+      );
+
+
+      /* =========================
+         محاولة Web Clipboard
+      ========================= */
+
+      if(
+        !navigator.clipboard
+      ){
+
+        throw new Error(
+          "Clipboard API غير متاحة."
+        );
+
+      }
+
+
+      if(
+        !window.ClipboardItem
+      ){
+
+        throw new Error(
+          "ClipboardItem غير مدعوم."
+        );
+
+      }
+
+
+      const blob =
+        new Blob(
+          [jsonText],
+          {
+            type:
+              "net.whatsapp.third-party.sticker-pack"
+          }
+        );
+
+
+      const item =
+        new ClipboardItem({
+
+          "net.whatsapp.third-party.sticker-pack":
+            blob
+
+        });
+
+
+      status.textContent =
+        "📋 محاولة إرسال بيانات الحزمة إلى Clipboard...";
+
+
+      await navigator.clipboard.write([
+        item
+      ]);
+
+
+      status.textContent =
+        "✅ Chrome قبل بيانات الحزمة — جاري فتح WhatsApp...";
+
+
+      console.log(
+        "Clipboard write succeeded."
+      );
+
+
+      setTimeout(
+        () => {
+
+          window.location.href =
+            "whatsapp://stickerPack";
+
+        },
+        300
+      );
+
+
+    }catch(error){
+
+      console.error(
+        "Direct WhatsApp error:",
+        error
+      );
+
+
+      status.textContent =
+        "❌ Chrome رفض تمرير بيانات WhatsApp: " +
+        error.message;
+
+
+      directBtn.disabled = false;
+
+      packBtn.disabled = false;
+
+    }
+
+  }
 );
-
-
-/*
-  تحويل الغلاف إلى Base64
-*/
-
-const trayImage =
-await blobToBase64(
-coverBlob
-);
-
-
-/*
-  تجهيز الملصقات
-*/
-
-const stickerArray = [];
-
-
-for(
-let i = 0;
-i < stickers.length;
-i++
-){
-
-status.textContent =
-`🧪 تجهيز الملصق ${i + 1} من ${stickers.length}...`;
-
-
-const imageData =
-await blobToBase64(
-stickers[i].blob
-);
-
-
-stickerArray.push({
-
-image_data:
-imageData,
-
-emojis:
-["🎀"],
-
-accessibility_text:
-`Miku sticker ${i + 1}`
-
-});
-
-}
-
-
-/*
-  إنشاء Identifier
-*/
-
-const identifier =
-"miku_stickers_" +
-Date.now();
-
-
-/*
-  نفس بنية JSON
-  المستخدمة في API الرسمي
-*/
-
-const whatsappPack = {
-
-ios_app_store_link:
-"",
-
-android_play_store_link:
-"",
-
-identifier:
-identifier,
-
-name:
-packName.value.trim() ||
-"Miku Stickers",
-
-publisher:
-"Miku Stickers",
-
-tray_image:
-trayImage,
-
-stickers:
-stickerArray
-
-};
-
-
-/*
-  تحويل JSON إلى نص
-*/
-
-const jsonText =
-JSON.stringify(
-whatsappPack
-);
-
-
-/*
-  عرض الحجم في Console
-  للاختبار فقط
-*/
-
-console.log(
-"WhatsApp Sticker Pack JSON:",
-whatsappPack
-);
-
-console.log(
-"JSON size:",
-jsonText.length
-);
-
-
-/*
-  محاولة فتح WhatsApp
-*/
-
-status.textContent =
-"📱 جاري محاولة فتح WhatsApp...";
-
-
-/*
-  هذا هو URL Scheme الرسمي
-  المستخدم من تكامل iOS
-*/
-
-window.location.href =
-"whatsapp://stickerPack";
-
-
-/*
-  إذا لم يستجب WhatsApp
-*/
-
-setTimeout(
-() => {
-
-status.textContent =
-"⚠️ تم تجهيز الحزمة، لكن Safari لم يسمح للموقع بإرسال بيانات Pasteboard الخاصة بواتساب. افتح Console إذا أردت فحص التجربة.";
-
-directBtn.disabled = false;
-
-packBtn.disabled = false;
-
-},
-2500
-);
-
-
-}catch(error){
-
-console.error(error);
-
-status.textContent =
-"❌ حدث خطأ أثناء تجهيز التجربة: " +
-error.message;
-
-directBtn.disabled = false;
-
-packBtn.disabled = false;
-
-}
-
-});
-
-
-/* =========================
-   إنشاء حزمة WASTICKERS
-========================= */
-
-packBtn.addEventListener(
-"click",
-async function(){
-
-if(
-stickers.length < 3
-){
-
-return;
-
-}
-
-
-let title =
-packName.value.trim();
-
-
-if(!title){
-
-title =
-"Miku Stickers";
-
-}
-
-
-packBtn.disabled = true;
-
-
-status.textContent =
-"🎀 جاري إنشاء الحزمة...";
-
-
-try{
-
-const zip =
-new JSZip();
-
-
-zip.file(
-"title.txt",
-title
-);
-
-
-zip.file(
-"author.txt",
-"Miku Stickers"
-);
-
-
-const cover =
-await makeCover(
-files[0]
-);
-
-
-zip.file(
-"cover.png",
-cover
-);
-
-
-const timestamp =
-Math.floor(
-Date.now() / 1000
-);
-
-
-for(
-let i = 0;
-i < stickers.length;
-i++
-){
-
-status.textContent =
-`📦 إضافة الملصق ${i + 1} من ${stickers.length}...`;
-
-
-zip.file(
-`${timestamp + i + 1}.webp`,
-stickers[i].blob
-);
-
-}
-
-
-status.textContent =
-"📦 تجهيز ملف الحزمة...";
-
-
-const wastickers =
-await zip.generateAsync({
-
-type:"blob",
-
-compression:"DEFLATE",
-
-compressionOptions:{
-level:6
-}
-
-});
-
-
-const url =
-URL.createObjectURL(
-wastickers
-);
-
-
-const link =
-document.createElement("a");
-
-
-link.href = url;
-
-
-link.download =
-`${slugify(title)}.wastickers`;
-
-
-document.body.appendChild(
-link
-);
-
-
-link.click();
-
-link.remove();
-
-
-setTimeout(
-() => {
-
-URL.revokeObjectURL(
-url
-);
-
-},
-3000
-);
-
-
-status.textContent =
-"✅ تم إنشاء حزمة .wastickers بنجاح 🎀";
-
-
-}catch(error){
-
-console.error(error);
-
-
-status.textContent =
-"❌ فشل إنشاء الحزمة: " +
-error.message;
-
-}
-
-
-packBtn.disabled = false;
-
-});
-
-
-/* =========================
-   تنظيف اسم الملف
-========================= */
-
-function slugify(
-text
-){
-
-return text
-.toLowerCase()
-.trim()
-.replace(
-/[^a-z0-9._ -]/g,
-""
-)
-.replace(
-/\s+/g,
-"_"
-)
-.replace(
-/_+/g,
-"_"
-)
-.slice(
-0,
-64
-)
-||
-"miku_stickers";
-
-}
 
 </script>
 
 </body>
+
 </html>
