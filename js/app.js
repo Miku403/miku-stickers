@@ -16,63 +16,168 @@ import {
 
 
 const fileInput =
-  document.getElementById(
-    "fileInput"
-  );
+  document.getElementById("fileInput");
 
 const packName =
-  document.getElementById(
-    "packName"
-  );
+  document.getElementById("packName");
 
 const preview =
-  document.getElementById(
-    "preview"
-  );
+  document.getElementById("preview");
 
 const status =
-  document.getElementById(
-    "status"
-  );
+  document.getElementById("status");
+
+const bridgeStatus =
+  document.getElementById("bridgeStatus");
 
 const createButton =
-  document.getElementById(
-    "createButton"
-  );
+  document.getElementById("createButton");
 
 const whatsappButton =
-  document.getElementById(
-    "whatsappButton"
-  );
+  document.getElementById("whatsappButton");
 
 
 let processedStickers = [];
 let currentPack = null;
 
 
-function setStatus(text) {
-  status.textContent = text;
+/* =========================
+   STATUS
+========================= */
+
+function setStatus(message) {
+
+  status.textContent =
+    message;
+
 }
 
+
+function setBridgeStatus(message) {
+
+  if (!bridgeStatus) {
+    return;
+  }
+
+  bridgeStatus.textContent =
+    message;
+
+}
+
+
+/* =========================
+   RESET
+========================= */
+
+function resetProject() {
+
+  processedStickers = [];
+  currentPack = null;
+
+  preview.innerHTML = "";
+
+  createButton.disabled =
+    true;
+
+  whatsappButton.disabled =
+    true;
+
+  setStatus("");
+
+  setBridgeStatus("");
+
+}
+
+
+/* =========================
+   IMAGE PREVIEW
+========================= */
+
+function createStickerCard(
+  sticker,
+  index
+) {
+
+  const card =
+    document.createElement(
+      "div"
+    );
+
+  card.className =
+    "sticker-card";
+
+
+  const img =
+    document.createElement(
+      "img"
+    );
+
+  img.src =
+    URL.createObjectURL(
+      sticker.blob
+    );
+
+  img.alt =
+    `Sticker ${index + 1}`;
+
+
+  const number =
+    document.createElement(
+      "div"
+    );
+
+  number.className =
+    "sticker-number";
+
+  number.textContent =
+    `#${index + 1}`;
+
+
+  const size =
+    document.createElement(
+      "div"
+    );
+
+  size.className =
+    "sticker-size";
+
+  size.textContent =
+    `${sticker.width}×${sticker.height} • ` +
+    `${formatBytes(sticker.size)}`;
+
+
+  card.appendChild(img);
+
+  card.appendChild(number);
+
+  card.appendChild(size);
+
+
+  return card;
+}
+
+
+/* =========================
+   FILE INPUT
+========================= */
 
 fileInput.addEventListener(
   "change",
   async () => {
 
-    processedStickers = [];
-    currentPack = null;
-
-    preview.innerHTML = "";
-
-    whatsappButton.disabled = true;
-    createButton.disabled = true;
+    resetProject();
 
 
     const files =
       Array.from(
-        fileInput.files
+        fileInput.files || []
       );
 
+
+    /*
+      WhatsApp sticker packs
+      require 3–30 stickers.
+    */
 
     if (
       files.length < 3 ||
@@ -80,7 +185,7 @@ fileInput.addEventListener(
     ) {
 
       setStatus(
-        "اختر من 3 إلى 30 صورة"
+        "اختر من 3 إلى 30 صورة."
       );
 
       return;
@@ -100,10 +205,54 @@ fileInput.addEventListener(
         i++
       ) {
 
+        const file =
+          files[i];
+
+
+        setStatus(
+          `جاري تجهيز الملصق ` +
+          `${i + 1} من ${files.length}...`
+        );
+
+
         const sticker =
           await processSticker(
-            files[i]
+            file
           );
+
+
+        /*
+          تأكيد إضافي:
+          الناتج يجب أن يكون 512×512.
+        */
+
+        if (
+          sticker.width !== 512 ||
+          sticker.height !== 512
+        ) {
+
+          throw new Error(
+            `الملصق ${i + 1} ليس 512×512`
+          );
+
+        }
+
+
+        /*
+          تأكيد الحجم.
+        */
+
+        if (
+          sticker.size >
+          100 * 1024
+        ) {
+
+          throw new Error(
+            `الملصق ${i + 1} أكبر من 100KB`
+          );
+
+        }
+
 
         processedStickers.push(
           sticker
@@ -111,73 +260,51 @@ fileInput.addEventListener(
 
 
         const card =
-          document.createElement(
-            "div"
-          );
-
-        card.className =
-          "sticker-card";
-
-
-        const img =
-          document.createElement(
-            "img"
-          );
-
-        img.src =
-          URL.createObjectURL(
-            sticker.blob
+          createStickerCard(
+            sticker,
+            i
           );
 
 
-        const number =
-          document.createElement(
-            "div"
-          );
+        preview.appendChild(
+          card
+        );
 
-        number.className =
-          "sticker-number";
-
-        number.textContent =
-          `#${i + 1}`;
-
-
-        const size =
-          document.createElement(
-            "div"
-          );
-
-        size.className =
-          "sticker-size";
-
-        size.textContent =
-          formatBytes(
-            sticker.size
-          );
-
-
-        card.appendChild(img);
-        card.appendChild(number);
-        card.appendChild(size);
-
-        preview.appendChild(card);
       }
 
 
       createButton.disabled =
         false;
 
+
       setStatus(
-        `${files.length} ملصقات جاهزة`
+        `تم تجهيز ${files.length} ملصقات ✓`
       );
 
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "Sticker processing error:",
+        error
+      );
+
+
+      processedStickers = [];
+
+      currentPack = null;
+
+
+      createButton.disabled =
+        true;
+
+      whatsappButton.disabled =
+        true;
+
 
       setStatus(
-        "حدث خطأ أثناء معالجة الصور"
+        error.message ||
+        "حدث خطأ أثناء معالجة الصور."
       );
 
     }
@@ -186,14 +313,38 @@ fileInput.addEventListener(
 );
 
 
+/* =========================
+   CREATE PACK
+========================= */
+
 createButton.addEventListener(
   "click",
   async () => {
 
-    try {
+    if (
+      processedStickers.length < 3 ||
+      processedStickers.length > 30
+    ) {
 
       setStatus(
-        "جاري إنشاء الحزمة..."
+        "يجب اختيار من 3 إلى 30 ملصقًا."
+      );
+
+      return;
+    }
+
+
+    try {
+
+      createButton.disabled =
+        true;
+
+      whatsappButton.disabled =
+        true;
+
+
+      setStatus(
+        "جاري إنشاء حزمة WhatsApp..."
       );
 
 
@@ -204,6 +355,63 @@ createButton.addEventListener(
         );
 
 
+      if (!currentPack) {
+
+        throw new Error(
+          "تعذر إنشاء الحزمة."
+        );
+
+      }
+
+
+      /*
+        تأكيدات إضافية على الـ Pack.
+      */
+
+      if (
+        !Array.isArray(
+          currentPack.stickers
+        )
+      ) {
+
+        throw new Error(
+          "بيانات الملصقات غير صحيحة."
+        );
+
+      }
+
+
+      if (
+        currentPack.stickers.length < 3 ||
+        currentPack.stickers.length > 30
+      ) {
+
+        throw new Error(
+          "عدد الملصقات غير صحيح."
+        );
+
+      }
+
+
+      if (
+        !currentPack.identifier ||
+        !currentPack.name ||
+        !currentPack.publisher ||
+        !currentPack.tray_image
+      ) {
+
+        throw new Error(
+          "بيانات الحزمة ناقصة."
+        );
+
+      }
+
+
+      /*
+        الحزمة أصبحت جاهزة
+        للـ Native Bridge.
+      */
+
       whatsappButton.disabled =
         false;
 
@@ -213,24 +421,184 @@ createButton.addEventListener(
       );
 
 
+      setBridgeStatus(
+        "الحزمة جاهزة للإرسال إلى Native Bridge."
+      );
+
+
       /*
-        للتجربة فقط:
-        عرض JSON في Console
+        مفيد أثناء التطوير.
       */
 
       console.log(
-        "WhatsApp Pack:",
+        "Miku Sticker Pack:",
         currentPack
       );
 
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "Pack creation error:",
+        error
+      );
+
+
+      currentPack =
+        null;
+
+
+      whatsappButton.disabled =
+        true;
+
 
       setStatus(
         error.message ||
-        "تعذر إنشاء الحزمة"
+        "تعذر إنشاء الحزمة."
+      );
+
+
+      setBridgeStatus("");
+
+    } finally {
+
+      createButton.disabled =
+        false;
+
+    }
+
+  }
+);
+
+
+/* =========================
+   SEND TO NATIVE BRIDGE
+========================= */
+
+whatsappButton.addEventListener(
+  "click",
+  async () => {
+
+    if (!currentPack) {
+
+      setStatus(
+        "أنشئ الحزمة أولًا."
+      );
+
+      return;
+    }
+
+
+    try {
+
+      whatsappButton.disabled =
+        true;
+
+
+      setStatus(
+        "جاري إرسال الحزمة..."
+      );
+
+
+      setBridgeStatus(
+        "جاري الاتصال بـ Miku Stickers Bridge..."
+      );
+
+
+      const result =
+        await sendToWhatsApp(
+          currentPack
+        );
+
+
+      /*
+        WKWebView Native Bridge
+      */
+
+      if (
+        result &&
+        result.method === "webkit"
+      ) {
+
+        setStatus(
+          "تم إرسال الحزمة إلى التطبيق ✓"
+        );
+
+
+        setBridgeStatus(
+          "تم تسليم الحزمة إلى Native Bridge."
+        );
+
+
+        return;
+      }
+
+
+      /*
+        Custom URL Scheme
+      */
+
+      if (
+        result &&
+        result.method === "url"
+      ) {
+
+        setStatus(
+          "جاري فتح Miku Stickers Bridge..."
+        );
+
+
+        setBridgeStatus(
+          "إذا كان التطبيق مثبتًا سيتم استلام الحزمة."
+        );
+
+
+        return;
+      }
+
+
+      /*
+        نتيجة غير معروفة.
+      */
+
+      setStatus(
+        "تم إرسال الطلب."
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Native Bridge error:",
+        error
+      );
+
+
+      setStatus(
+        error.message ||
+        "تعذر الاتصال بـ Native Bridge."
+      );
+
+
+      setBridgeStatus(
+        "لم يتم العثور على Native Bridge."
+      );
+
+    } finally {
+
+      /*
+        نعطي النظام لحظة قبل
+        إعادة تفعيل الزر.
+      */
+
+      setTimeout(
+        () => {
+
+          whatsappButton.disabled =
+            false;
+
+        },
+        1500
       );
 
     }
@@ -239,17 +607,70 @@ createButton.addEventListener(
 );
 
 
-whatsappButton.addEventListener(
-  "click",
-  async () => {
+/* =========================
+   NATIVE BRIDGE RESULT
+========================= */
 
-    if (!currentPack) {
+window.addEventListener(
+  "mikuBridgeResult",
+  event => {
+
+    const result =
+      event.detail;
+
+
+    if (!result) {
       return;
     }
 
-    await sendToWhatsApp(
-      currentPack
-    );
+
+    if (
+      result.success === true
+    ) {
+
+      setStatus(
+        "تم استيراد الحزمة بنجاح ✓"
+      );
+
+
+      setBridgeStatus(
+        "WhatsApp استلم الحزمة."
+      );
+
+
+      return;
+    }
+
+
+    if (
+      result.success === false
+    ) {
+
+      setStatus(
+        result.message ||
+        "فشل استيراد الحزمة."
+      );
+
+
+      setBridgeStatus(
+        result.error ||
+        "حدث خطأ في Native Bridge."
+      );
+
+    }
 
   }
+);
+
+
+/* =========================
+   INITIAL STATE
+========================= */
+
+setStatus(
+  "اختر من 3 إلى 30 صورة."
+);
+
+setBridgeStatus(
+  "Miku Stickers جاهز."
 );
