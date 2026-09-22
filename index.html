@@ -9,7 +9,17 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>Miku Stickers</title>
+  <meta
+    name="theme-color"
+    content="#ffffff"
+  >
+
+  <meta
+    name="description"
+    content="Miku Stickers - تحويل الصور إلى ملصقات WhatsApp"
+  >
+
+  <title>𝘔𝘐𝘒𝘜 𝘚𝘛𝘐𝘊𝘒𝘌𝘙𝘚</title>
 
   <link
     rel="stylesheet"
@@ -21,26 +31,50 @@
 
   <main class="container">
 
+    <!-- =========================
+         HEADER
+    ========================== -->
+
     <header>
-      <h1>𝘔𝘐𝘒𝘜 𝘚𝘛𝘐𝘊𝘒𝘌𝘙𝘚</h1>
+
+      <h1>
+        𝘔𝘐𝘒𝘜 𝘚𝘛𝘐𝘊𝘒𝘌𝘙𝘚
+      </h1>
 
       <p>
-        حوّل صورك إلى ملصقات واتساب
+        حوّل صورك إلى ملصقات WhatsApp
       </p>
+
     </header>
+
+
+    <!-- =========================
+         MAIN CARD
+    ========================== -->
 
     <section class="card">
 
-      <label for="packName">
-        اسم الحزمة
-      </label>
 
-      <input
-        id="packName"
-        type="text"
-        maxlength="64"
-        placeholder="Miku Stickers"
-      >
+      <!-- PACK NAME -->
+
+      <div class="field">
+
+        <label for="packName">
+          اسم حزمة الملصقات
+        </label>
+
+        <input
+          id="packName"
+          type="text"
+          maxlength="64"
+          autocomplete="off"
+          placeholder="Miku Stickers"
+        >
+
+      </div>
+
+
+      <!-- FILE UPLOAD -->
 
       <label
         class="upload"
@@ -55,43 +89,149 @@
           اختر من 3 إلى 30 صورة
         </span>
 
+        <small>
+          PNG / JPG / WEBP
+        </small>
+
       </label>
+
 
       <input
         id="fileInput"
         type="file"
-        accept="image/*"
+        accept="image/png,image/jpeg,image/webp,image/*"
         multiple
         hidden
       >
 
-      <div id="status"></div>
+
+      <!-- STATUS -->
 
       <div
+        id="status"
+        class="status"
+        aria-live="polite"
+      >
+        اختر من 3 إلى 30 صورة.
+      </div>
+
+
+      <!-- PREVIEW -->
+
+      <section
         id="preview"
         class="preview"
-      ></div>
+        aria-label="معاينة الملصقات"
+      ></section>
+
+
+      <!-- CREATE PACK -->
 
       <button
         id="createButton"
+        type="button"
         disabled
       >
         إنشاء حزمة الملصقات
       </button>
 
+
+      <!-- BRIDGE STATUS -->
+
+      <div
+        id="bridgeStatus"
+        class="bridge-status"
+        aria-live="polite"
+      >
+        Miku Stickers جاهز.
+      </div>
+
+
+      <!-- WHATSAPP -->
+
       <button
         id="whatsappButton"
         class="secondary"
+        type="button"
         disabled
       >
         إضافة إلى WhatsApp
       </button>
 
+
     </section>
+
+
+    <!-- =========================
+         INFORMATION
+    ========================== -->
+
+    <section class="info">
+
+      <div class="info-item">
+
+        <strong>
+          512×512
+        </strong>
+
+        <span>
+          أبعاد الملصق
+        </span>
+
+      </div>
+
+
+      <div class="info-item">
+
+        <strong>
+          ≤ 100KB
+        </strong>
+
+        <span>
+          حجم الملصق
+        </span>
+
+      </div>
+
+
+      <div class="info-item">
+
+        <strong>
+          3–30
+        </strong>
+
+        <span>
+          عدد الملصقات
+        </span>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <footer>
+
+      <p>
+        𝘔𝘐𝘒𝘜 𝘚𝘛𝘐𝘊𝘒𝘌𝘙𝘚
+      </p>
+
+    </footer>
 
   </main>
 
-  <script type="module" src="js/app.js"></script>
+
+  <!-- =========================
+       JAVASCRIPT
+  ========================== -->
+
+  <script
+    type="module"
+    src="js/app.js"
+  ></script>
 
 </body>
 
