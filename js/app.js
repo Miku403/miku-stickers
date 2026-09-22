@@ -110,13 +110,16 @@ function canvasToWebP(canvas, quality) {
 
 async function makeSticker(file) {
 
-  const image = await loadImage(file);
+  const image =
+    await loadImage(file);
+
 
   const canvas =
     document.createElement("canvas");
 
   canvas.width = 512;
   canvas.height = 512;
+
 
   const ctx =
     canvas.getContext("2d");
@@ -136,7 +139,7 @@ async function makeSticker(file) {
 
 
   /*
-    Cover Crop
+    نحسب Cover Crop
   */
 
   const scale =
@@ -177,49 +180,45 @@ async function makeSticker(file) {
   );
 
 
-  /*
-    الحد الحقيقي:
-    100KB = 102400 bytes
-  */
-
   const MAX_SIZE =
     100 * 1024;
 
 
   /*
-    نبدأ بجودة عالية
+    أول محاولة
   */
 
   let blob =
     await canvasToWebP(
       canvas,
-      0.92
+      0.90
     );
 
 
-  /*
-    إذا الناتج أقل من 100KB
-    خلاص.
-  */
+  if (
+    blob.size <= MAX_SIZE
+  ) {
 
-  if (blob.size <= MAX_SIZE) {
     return blob;
+
   }
 
 
   /*
-    Binary Search
-    للعثور على أعلى جودة
-    ممكنة تحت 100KB.
+    نحاول تقليل الجودة تدريجيًا
   */
 
   let low = 0.01;
-  let high = 0.92;
+  let high = 0.90;
 
   let best = null;
 
 
-  for (let i = 0; i < 18; i++) {
+  for (
+    let i = 0;
+    i < 15;
+    i++
+  ) {
 
     const quality =
       (low + high) / 2;
@@ -232,7 +231,9 @@ async function makeSticker(file) {
       );
 
 
-    if (blob.size <= MAX_SIZE) {
+    if (
+      blob.size <= MAX_SIZE
+    ) {
 
       best = blob;
 
@@ -241,13 +242,11 @@ async function makeSticker(file) {
     } else {
 
       high = quality;
+
     }
+
   }
 
-
-  /*
-    إذا وجدنا نسخة مناسبة
-  */
 
   if (best) {
     return best;
@@ -255,28 +254,164 @@ async function makeSticker(file) {
 
 
   /*
-    محاولة أخيرة بأقل جودة
+    إذا الجودة وحدها ما كفت،
+    نقلل التفاصيل قبل الضغط.
   */
 
-  blob =
-    await canvasToWebP(
-      canvas,
-      0.01
+  const sizes = [
+    448,
+    384,
+    320,
+    256
+  ];
+
+
+  for (
+    const workingSize of sizes
+  ) {
+
+    const smallCanvas =
+      document.createElement(
+        "canvas"
+      );
+
+
+    smallCanvas.width =
+      workingSize;
+
+    smallCanvas.height =
+      workingSize;
+
+
+    const smallCtx =
+      smallCanvas.getContext(
+        "2d"
+      );
+
+
+    const smallScale =
+      Math.max(
+        workingSize / imageWidth,
+        workingSize / imageHeight
+      );
+
+
+    const smallWidth =
+      imageWidth * smallScale;
+
+
+    const smallHeight =
+      imageHeight * smallScale;
+
+
+    const smallX =
+      (workingSize - smallWidth) / 2;
+
+
+    const smallY =
+      (workingSize - smallHeight) / 2;
+
+
+    smallCtx.clearRect(
+      0,
+      0,
+      workingSize,
+      workingSize
     );
 
 
-  if (blob.size > MAX_SIZE) {
-
-    throw new Error(
-      `تعذر ضغط الملصق تحت 100KB. الحجم النهائي: ${formatBytes(blob.size)}`
+    smallCtx.drawImage(
+      image,
+      smallX,
+      smallY,
+      smallWidth,
+      smallHeight
     );
+
+
+    /*
+      نرجعها إلى Canvas 512×512
+      حتى يبقى الناتج النهائي 512×512.
+    */
+
+    ctx.clearRect(
+      0,
+      0,
+      512,
+      512
+    );
+
+
+    ctx.drawImage(
+      smallCanvas,
+      0,
+      0,
+      512,
+      512
+    );
+
+
+    /*
+      نبحث عن جودة مناسبة
+    */
+
+    low = 0.05;
+    high = 0.90;
+    best = null;
+
+
+    for (
+      let i = 0;
+      i < 15;
+      i++
+    ) {
+
+      const quality =
+        (low + high) / 2;
+
+
+      blob =
+        await canvasToWebP(
+          canvas,
+          quality
+        );
+
+
+      if (
+        blob.size <= MAX_SIZE
+      ) {
+
+        best = blob;
+
+        low = quality;
+
+      } else {
+
+        high = quality;
+
+      }
+
+    }
+
+
+    if (best) {
+
+      return best;
+
+    }
 
   }
 
 
-  return blob;
-}
+  /*
+    إذا وصلنا هنا،
+    الصورة نفسها صعبة جدًا للضغط.
+  */
 
+  throw new Error(
+    "تعذر ضغط هذه الصورة تحت 100KB."
+  );
+}
 
 /* =========================
    Preview Card
