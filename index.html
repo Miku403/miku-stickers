@@ -2,7 +2,6 @@
 <html lang="ar" dir="rtl">
 
 <head>
-
 <meta charset="UTF-8">
 
 <meta
@@ -97,11 +96,6 @@ button:disabled{
   color:white;
 }
 
-#shareBtn{
-  background:#444;
-  color:white;
-}
-
 .status{
   text-align:center;
   margin-top:15px;
@@ -154,8 +148,8 @@ button:disabled{
 }
 
 </style>
-
 </head>
+
 
 <body>
 
@@ -189,11 +183,10 @@ button:disabled{
 >
 
 
-<button
-  id="convertBtn"
->
+<button id="convertBtn">
 تحويل الملصقات
 </button>
+
 
 <div
   id="status"
@@ -228,6 +221,7 @@ button:disabled{
 🧪 تجربة إرسال الحزمة مباشرة إلى WhatsApp
 </button>
 
+
 <button
   id="packBtn"
   disabled
@@ -235,15 +229,17 @@ button:disabled{
 📦 تحميل حزمة .wastickers
 </button>
 
+
 <p class="small">
-التجربة المباشرة تحاول وضع بيانات حزمة WhatsApp
-في Web Clipboard ثم فتح WhatsApp.
+التجربة المباشرة تحاول تمرير بيانات حزمة
+WhatsApp إلى Clipboard ثم فتح WhatsApp.
 </p>
+
 
 <div class="warning">
 
-⚠️ إذا رفض Chrome نوع البيانات المخصص،
-سيظهر سبب الرفض بدل اعتبار العملية ناجحة.
+⚠️ هذه تجربة. إذا رفض Chrome نوع البيانات
+أو رفض WhatsApp الحزمة، سيظهر الخطأ.
 
 </div>
 
@@ -253,6 +249,11 @@ button:disabled{
 
 
 <script>
+
+
+/* =========================
+   العناصر
+========================= */
 
 const fileInput =
   document.getElementById("fileInput");
@@ -282,7 +283,9 @@ let stickers = [];
 
 
 /* =========================
-   تحويل الصورة إلى 512x512
+   تحويل الصورة
+   512 × 512
+   أقل من أو يساوي 100KB
 ========================= */
 
 async function makeSticker(file){
@@ -290,8 +293,10 @@ async function makeSticker(file){
   const image =
     await createImageBitmap(file);
 
+
   const MAX_SIZE =
     100 * 1024;
+
 
   const canvas =
     document.createElement("canvas");
@@ -299,8 +304,10 @@ async function makeSticker(file){
   canvas.width = 512;
   canvas.height = 512;
 
+
   const ctx =
     canvas.getContext("2d");
+
 
   ctx.clearRect(
     0,
@@ -309,10 +316,12 @@ async function makeSticker(file){
     512
   );
 
+
   const margin = 16;
 
   const available =
     512 - (margin * 2);
+
 
   const scale =
     Math.min(
@@ -320,17 +329,20 @@ async function makeSticker(file){
       available / image.height
     );
 
+
   const width =
     image.width * scale;
 
   const height =
     image.height * scale;
 
+
   const x =
     (512 - width) / 2;
 
   const y =
     (512 - height) / 2;
+
 
   ctx.drawImage(
     image,
@@ -339,6 +351,7 @@ async function makeSticker(file){
     width,
     height
   );
+
 
   image.close();
 
@@ -359,19 +372,17 @@ async function makeSticker(file){
 
 
   let blob =
-    await convert(.92);
+    await convert(0.92);
 
 
   if(blob.size <= MAX_SIZE){
-
     return blob;
-
   }
 
 
-  let low = .05;
+  let low = 0.05;
 
-  let high = .90;
+  let high = 0.90;
 
   let bestBlob = null;
 
@@ -385,11 +396,14 @@ async function makeSticker(file){
     const quality =
       (low + high) / 2;
 
+
     blob =
       await convert(quality);
 
 
-    if(blob.size <= MAX_SIZE){
+    if(
+      blob.size <= MAX_SIZE
+    ){
 
       bestBlob = blob;
 
@@ -405,19 +419,18 @@ async function makeSticker(file){
 
 
   if(bestBlob){
-
     return bestBlob;
-
   }
 
 
-  return await convert(.01);
+  return await convert(0.01);
 
 }
 
 
 /* =========================
-   الغلاف 96x96 PNG
+   الغلاف
+   96 × 96 PNG
 ========================= */
 
 async function makeCover(file){
@@ -425,14 +438,18 @@ async function makeCover(file){
   const image =
     await createImageBitmap(file);
 
+
   const canvas =
     document.createElement("canvas");
+
 
   canvas.width = 96;
   canvas.height = 96;
 
+
   const ctx =
     canvas.getContext("2d");
+
 
   ctx.clearRect(
     0,
@@ -448,14 +465,18 @@ async function makeCover(file){
       96 / image.height
     );
 
+
   const width =
     image.width * scale;
+
 
   const height =
     image.height * scale;
 
+
   const x =
     (96 - width) / 2;
+
 
   const y =
     (96 - height) / 2;
@@ -468,6 +489,7 @@ async function makeCover(file){
     width,
     height
   );
+
 
   image.close();
 
@@ -496,21 +518,26 @@ function blobToBase64(blob){
       const reader =
         new FileReader();
 
+
       reader.onloadend =
         () => {
 
           const result =
             reader.result;
 
+
           const base64 =
             result.split(",")[1];
+
 
           resolve(base64);
 
         };
 
+
       reader.onerror =
         reject;
+
 
       reader.readAsDataURL(blob);
 
@@ -521,7 +548,7 @@ function blobToBase64(blob){
 
 
 /* =========================
-   عرض المعاينة
+   المعاينة
 ========================= */
 
 function renderPreview(){
@@ -535,12 +562,14 @@ function renderPreview(){
       const div =
         document.createElement("div");
 
+
       div.className =
         "sticker";
 
 
       const img =
         document.createElement("img");
+
 
       img.src =
         URL.createObjectURL(
@@ -550,6 +579,7 @@ function renderPreview(){
 
       const button =
         document.createElement("button");
+
 
       button.textContent =
         "مشاركة";
@@ -564,7 +594,8 @@ function renderPreview(){
               [sticker.blob],
               `miku-${index + 1}.webp`,
               {
-                type:"image/webp"
+                type:
+                  "image/webp"
               }
             );
 
@@ -581,7 +612,8 @@ function renderPreview(){
 
               await navigator.share({
                 files:[file],
-                title:"Miku Sticker"
+                title:
+                  "Miku Sticker"
               });
 
             }catch(error){
@@ -702,7 +734,7 @@ convertBtn.addEventListener(
 
 
         stickers.push({
-          blob:blob
+          blob: blob
         });
 
       }
@@ -723,6 +755,7 @@ convertBtn.addEventListener(
 
       console.error(error);
 
+
       status.textContent =
         "❌ حدث خطأ: " +
         error.message;
@@ -737,7 +770,7 @@ convertBtn.addEventListener(
 
 
 /* =========================
-   إنشاء .wastickers
+   إنشاء wastickers
 ========================= */
 
 packBtn.addEventListener(
@@ -747,9 +780,7 @@ packBtn.addEventListener(
     if(
       stickers.length < 3
     ){
-
       return;
-
     }
 
 
@@ -824,17 +855,22 @@ packBtn.addEventListener(
       const a =
         document.createElement("a");
 
+
       a.href = url;
+
 
       a.download =
         `${name}.wastickers`;
+
 
       a.click();
 
 
       setTimeout(
         () => {
+
           URL.revokeObjectURL(url);
+
         },
         1000
       );
@@ -846,6 +882,7 @@ packBtn.addEventListener(
     }catch(error){
 
       console.error(error);
+
 
       status.textContent =
         "❌ خطأ في إنشاء الحزمة: " +
@@ -863,7 +900,7 @@ packBtn.addEventListener(
 
 
 /* =========================
-   التجربة المباشرة
+   WhatsApp DIRECT TEST
 ========================= */
 
 directBtn.addEventListener(
@@ -873,9 +910,7 @@ directBtn.addEventListener(
     if(
       stickers.length < 3
     ){
-
       return;
-
     }
 
 
@@ -890,6 +925,10 @@ directBtn.addEventListener(
         "🧪 تجهيز بيانات WhatsApp...";
 
 
+      /*
+       * إنشاء صورة الغلاف
+       */
+
       const coverBlob =
         await makeCover(
           files[0]
@@ -901,6 +940,10 @@ directBtn.addEventListener(
           coverBlob
         );
 
+
+      /*
+       * إنشاء بيانات الملصقات
+       */
 
       const stickerArray = [];
 
@@ -937,21 +980,15 @@ directBtn.addEventListener(
       }
 
 
-      const identifier =
-        "miku_stickers_" +
-        Date.now();
-
+      /*
+       * بيانات الحزمة
+       */
 
       const whatsappPack = {
 
-        ios_app_store_link:
-          "",
-
-        android_play_store_link:
-          "",
-
         identifier:
-          identifier,
+          "miku_stickers_" +
+          Date.now(),
 
         name:
           packName.value.trim() ||
@@ -964,10 +1001,20 @@ directBtn.addEventListener(
           trayImage,
 
         stickers:
-          stickerArray
+          stickerArray,
+
+        ios_app_store_link:
+          "",
+
+        android_play_store_link:
+          ""
 
       };
 
+
+      /*
+       * تحويل JSON إلى نص
+       */
 
       const jsonText =
         JSON.stringify(
@@ -976,20 +1023,24 @@ directBtn.addEventListener(
 
 
       console.log(
-        "WhatsApp Sticker Pack:",
+        "========== WhatsApp Pack =========="
+      );
+
+
+      console.log(
         whatsappPack
       );
 
 
       console.log(
-        "JSON size:",
+        "JSON length:",
         jsonText.length
       );
 
 
-      /* =========================
-         محاولة Web Clipboard
-      ========================= */
+      /*
+       * التأكد من توفر Clipboard
+       */
 
       if(
         !navigator.clipboard
@@ -1013,42 +1064,54 @@ directBtn.addEventListener(
       }
 
 
-      const blob =
-        new Blob(
-          [jsonText],
-          {
-            type:
-              "net.whatsapp.third-party.sticker-pack"
-          }
-        );
+      /*
+       * محاولة Web Clipboard
+       *
+       * النوع الخارجي هو نوع WhatsApp
+       * والمحتوى نفسه JSON.
+       */
 
-
-      const item =
+      const clipboardItem =
         new ClipboardItem({
 
           "net.whatsapp.third-party.sticker-pack":
-            blob
+
+            new Blob(
+              [jsonText],
+              {
+                type:
+                  "text/plain"
+              }
+            )
 
         });
 
 
       status.textContent =
-        "📋 محاولة إرسال بيانات الحزمة إلى Clipboard...";
+        "📋 محاولة تمرير بيانات الحزمة إلى WhatsApp...";
 
+
+      /*
+       * كتابة الحزمة
+       */
 
       await navigator.clipboard.write([
-        item
+        clipboardItem
       ]);
-
-
-      status.textContent =
-        "✅ Chrome قبل بيانات الحزمة — جاري فتح WhatsApp...";
 
 
       console.log(
         "Clipboard write succeeded."
       );
 
+
+      status.textContent =
+        "✅ تم قبول بيانات الحزمة — جاري فتح WhatsApp...";
+
+
+      /*
+       * فتح WhatsApp
+       */
 
       setTimeout(
         () => {
@@ -1064,13 +1127,15 @@ directBtn.addEventListener(
     }catch(error){
 
       console.error(
-        "Direct WhatsApp error:",
+        "WhatsApp direct error:",
         error
       );
 
 
       status.textContent =
-        "❌ Chrome رفض تمرير بيانات WhatsApp: " +
+        "❌ فشلت محاولة تمرير الحزمة: " +
+        error.name +
+        " — " +
         error.message;
 
 
@@ -1086,5 +1151,4 @@ directBtn.addEventListener(
 </script>
 
 </body>
-
 </html>
