@@ -1,1 +1,83 @@
+name: Build Miku Stickers iOS
 
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Show Swift version
+        run: swift --version
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Create Xcode project
+        run: |
+          mkdir -p BuildProject
+
+          cat > BuildProject/project.yml <<'EOF'
+          name: MikuStickersApp
+
+          options:
+            bundleIdPrefix: com.miku
+
+          targets:
+            MikuStickersApp:
+              type: application
+              platform: iOS
+              deploymentTarget: "17.0"
+
+              sources:
+                - path: ../MikuStickersApp
+
+              settings:
+                base:
+                  PRODUCT_BUNDLE_IDENTIFIER: com.miku.stickers
+                  SWIFT_VERSION: 5.0
+                  INFOPLIST_KEY_UILaunchScreen_Generation: YES
+          EOF
+
+      - name: Install XcodeGen
+        run: |
+          brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: BuildProject
+        run: |
+          xcodegen generate
+
+      - name: Build
+        working-directory: BuildProject
+        run: |
+          xcodebuild \
+            -project MikuStickersApp.xcodeproj \
+            -scheme MikuStickersApp \
+            -sdk iphoneos \
+            -configuration Release \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            build
+
+      - name: Package app
+        run: |
+          mkdir -p output
+
+          cp -R \
+            BuildProject/build/Build/Products/Release-iphoneos/MikuStickersApp.app \
+            output/MikuStickersApp.app
+
+      - name: Upload app
+        uses: actions/upload-artifact@v6
+        with:
+          name: MikuStickersApp
+          path: output/MikuStickersApp.app
