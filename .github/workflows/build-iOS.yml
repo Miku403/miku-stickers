@@ -20,6 +20,10 @@ jobs:
       - name: Show Xcode version
         run: xcodebuild -version
 
+      - name: Install XcodeGen
+        run: |
+          brew install xcodegen
+
       - name: Create Xcode project
         run: |
           mkdir -p BuildProject
@@ -43,19 +47,16 @@ jobs:
                 base:
                   PRODUCT_BUNDLE_IDENTIFIER: com.miku.stickers
                   SWIFT_VERSION: 5.0
+                  GENERATE_INFOPLIST_FILE: YES
                   INFOPLIST_KEY_UILaunchScreen_Generation: YES
           EOF
-
-      - name: Install XcodeGen
-        run: |
-          brew install xcodegen
 
       - name: Generate Xcode project
         working-directory: BuildProject
         run: |
           xcodegen generate
 
-      - name: Build
+      - name: Build iOS app
         working-directory: BuildProject
         run: |
           xcodebuild \
