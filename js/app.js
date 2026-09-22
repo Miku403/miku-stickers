@@ -1,261 +1,142 @@
-/* =========================================
-   MIKU STICKERS
-   Main App
-========================================= */
-
-
-/* =========================================
-   Elements
-========================================= */
-
-const fileInput =
-  document.getElementById("fileInput");
-
-const packName =
-  document.getElementById("packName");
-
-const preview =
-  document.getElementById("preview");
-
-const status =
-  document.getElementById("status");
-
-const bridgeStatus =
-  document.getElementById("bridgeStatus");
-
-const createButton =
-  document.getElementById("createButton");
-
-const whatsappButton =
-  document.getElementById("whatsappButton");
-
-
-/* =========================================
-   Data
-========================================= */
-
-let selectedFiles = [];
+const fileInput = document.getElementById("fileInput");
+const packName = document.getElementById("packName");
+const preview = document.getElementById("preview");
+const status = document.getElementById("status");
+const bridgeStatus = document.getElementById("bridgeStatus");
+const createButton = document.getElementById("createButton");
+const whatsappButton = document.getElementById("whatsappButton");
 
 let processedStickers = [];
-
 let currentPack = null;
 
 
-/* =========================================
+/* =========================
    Status
-========================================= */
+========================= */
 
 function setStatus(message) {
-
-  status.textContent =
-    message;
-
+  status.textContent = message;
 }
-
 
 function setBridgeStatus(message) {
-
-  bridgeStatus.textContent =
-    message;
-
+  bridgeStatus.textContent = message;
 }
 
 
-/* =========================================
-   Format File Size
-========================================= */
+/* =========================
+   File Size
+========================= */
 
 function formatBytes(bytes) {
-
   if (bytes < 1024) {
-
     return `${bytes} B`;
-
   }
-
 
   if (bytes < 1024 * 1024) {
-
-    return `${(
-      bytes / 1024
-    ).toFixed(1)} KB`;
-
+    return `${(bytes / 1024).toFixed(1)} KB`;
   }
 
-
-  return `${(
-    bytes / 1024 / 1024
-  ).toFixed(2)} MB`;
-
+  return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 }
 
 
-/* =========================================
-   Load Image
-========================================= */
+/* =========================
+   Read Image
+========================= */
 
 function loadImage(file) {
+  return new Promise((resolve, reject) => {
 
-  return new Promise(
-    (resolve, reject) => {
+    const reader = new FileReader();
 
-      const reader =
-        new FileReader();
+    reader.onload = () => {
 
+      const image = new Image();
 
-      reader.onload =
-        function () {
+      image.onload = () => {
+        resolve(image);
+      };
 
-          const image =
-            new Image();
+      image.onerror = () => {
+        reject(
+          new Error("تعذر قراءة الصورة.")
+        );
+      };
 
+      image.src = reader.result;
+    };
 
-          image.onload =
-            function () {
-
-              resolve(image);
-
-            };
-
-
-          image.onerror =
-            function () {
-
-              reject(
-                new Error(
-                  "تعذر قراءة إحدى الصور."
-                )
-              );
-
-            };
-
-
-          image.src =
-            reader.result;
-
-        };
-
-
-      reader.onerror =
-        function () {
-
-          reject(
-            new Error(
-              "تعذر قراءة ملف الصورة."
-            )
-          );
-
-        };
-
-
-      reader.readAsDataURL(file);
-
-    }
-  );
-
-}
-
-
-/* =========================================
-   Convert Canvas To WebP
-========================================= */
-
-function canvasToWebP(
-  canvas,
-  quality
-) {
-
-  return new Promise(
-    (resolve, reject) => {
-
-      canvas.toBlob(
-        function (blob) {
-
-          if (!blob) {
-
-            reject(
-              new Error(
-                "تعذر تحويل الصورة إلى WebP."
-              )
-            );
-
-            return;
-          }
-
-
-          resolve(blob);
-
-        },
-        "image/webp",
-        quality
+    reader.onerror = () => {
+      reject(
+        new Error("تعذر قراءة ملف الصورة.")
       );
+    };
 
-    }
-  );
-
+    reader.readAsDataURL(file);
+  });
 }
 
 
-/* =========================================
-   Create Sticker
-   512 × 512
-   Cover Crop
-========================================= */
+/* =========================
+   Canvas → WebP
+========================= */
+
+function canvasToWebP(canvas, quality) {
+  return new Promise((resolve, reject) => {
+
+    canvas.toBlob(
+      blob => {
+
+        if (!blob) {
+          reject(
+            new Error("تعذر إنشاء WebP.")
+          );
+          return;
+        }
+
+        resolve(blob);
+      },
+      "image/webp",
+      quality
+    );
+
+  });
+}
+
+
+/* =========================
+   Make Sticker
+========================= */
 
 async function makeSticker(file) {
 
-  const image =
-    await loadImage(file);
-
+  const image = await loadImage(file);
 
   const canvas =
     document.createElement("canvas");
 
-
   canvas.width = 512;
   canvas.height = 512;
-
 
   const ctx =
     canvas.getContext("2d");
 
-
   if (!ctx) {
-
     throw new Error(
-      "Canvas غير مدعوم في هذا المتصفح."
+      "Canvas غير مدعوم."
     );
-
   }
 
 
   const imageWidth =
-    image.naturalWidth ||
-    image.width;
-
+    image.naturalWidth;
 
   const imageHeight =
-    image.naturalHeight ||
-    image.height;
-
-
-  if (
-    !imageWidth ||
-    !imageHeight
-  ) {
-
-    throw new Error(
-      "أبعاد الصورة غير صالحة."
-    );
-
-  }
+    image.naturalHeight;
 
 
   /*
     Cover Crop
-
-    الصورة تملأ 512×512
-    بالكامل بدون فراغات.
   */
 
   const scale =
@@ -268,14 +149,12 @@ async function makeSticker(file) {
   const width =
     imageWidth * scale;
 
-
   const height =
     imageHeight * scale;
 
 
   const x =
     (512 - width) / 2;
-
 
   const y =
     (512 - height) / 2;
@@ -299,16 +178,17 @@ async function makeSticker(file) {
 
 
   /*
-    لا نحتاج الصورة الأصلية
-    بعد الرسم.
+    الحد الحقيقي:
+    100KB = 102400 bytes
   */
 
-  image.src = "";
+  const MAX_SIZE =
+    100 * 1024;
 
 
-  /* =====================================
-     محاولة بجودة عالية
-  ===================================== */
+  /*
+    نبدأ بجودة عالية
+  */
 
   let blob =
     await canvasToWebP(
@@ -317,35 +197,29 @@ async function makeSticker(file) {
     );
 
 
-  const MAX_SIZE =
-    100 * 1024;
+  /*
+    إذا الناتج أقل من 100KB
+    خلاص.
+  */
 
-
-  if (
-    blob.size <= MAX_SIZE
-  ) {
-
+  if (blob.size <= MAX_SIZE) {
     return blob;
-
   }
 
 
-  /* =====================================
-     البحث عن أفضل جودة تحت 100KB
-  ===================================== */
+  /*
+    Binary Search
+    للعثور على أعلى جودة
+    ممكنة تحت 100KB.
+  */
 
-  let low = 0.05;
-
-  let high = 0.90;
+  let low = 0.01;
+  let high = 0.92;
 
   let best = null;
 
 
-  for (
-    let i = 0;
-    i < 14;
-    i++
-  ) {
+  for (let i = 0; i < 18; i++) {
 
     const quality =
       (low + high) / 2;
@@ -358,9 +232,7 @@ async function makeSticker(file) {
       );
 
 
-    if (
-      blob.size <= MAX_SIZE
-    ) {
+    if (blob.size <= MAX_SIZE) {
 
       best = blob;
 
@@ -369,34 +241,46 @@ async function makeSticker(file) {
     } else {
 
       high = quality;
-
     }
-
-  }
-
-
-  if (best) {
-
-    return best;
-
   }
 
 
   /*
-    محاولة أخيرة
+    إذا وجدنا نسخة مناسبة
   */
 
-  return await canvasToWebP(
-    canvas,
-    0.01
-  );
+  if (best) {
+    return best;
+  }
 
+
+  /*
+    محاولة أخيرة بأقل جودة
+  */
+
+  blob =
+    await canvasToWebP(
+      canvas,
+      0.01
+    );
+
+
+  if (blob.size > MAX_SIZE) {
+
+    throw new Error(
+      `تعذر ضغط الملصق تحت 100KB. الحجم النهائي: ${formatBytes(blob.size)}`
+    );
+
+  }
+
+
+  return blob;
 }
 
 
-/* =========================================
-   Create Preview Card
-========================================= */
+/* =========================
+   Preview Card
+========================= */
 
 function createPreviewCard(
   blob,
@@ -406,7 +290,6 @@ function createPreviewCard(
   const card =
     document.createElement("div");
 
-
   card.className =
     "sticker-card";
 
@@ -414,37 +297,18 @@ function createPreviewCard(
   const img =
     document.createElement("img");
 
-
-  const url =
-    URL.createObjectURL(blob);
-
-
   img.src =
-    url;
-
+    URL.createObjectURL(blob);
 
   img.alt =
     `Sticker ${index + 1}`;
 
 
-  img.onload =
-    function () {
-
-      /*
-        نخلي الـ URL موجود
-        لأن الصورة تستخدمه.
-      */
-
-    };
-
-
   const number =
     document.createElement("div");
 
-
   number.className =
     "sticker-number";
-
 
   number.textContent =
     `#${index + 1}`;
@@ -453,184 +317,103 @@ function createPreviewCard(
   const size =
     document.createElement("div");
 
-
   size.className =
     "sticker-size";
 
-
   size.textContent =
-    `512×512 • ${formatBytes(
-      blob.size
-    )}`;
+    `512×512 • ${formatBytes(blob.size)}`;
 
 
   card.appendChild(img);
-
   card.appendChild(number);
-
   card.appendChild(size);
 
 
   return card;
-
 }
 
 
-/* =========================================
+/* =========================
    Reset
-========================================= */
+========================= */
 
 function resetProject() {
-
-  selectedFiles = [];
 
   processedStickers = [];
 
   currentPack = null;
 
+  preview.innerHTML = "";
 
-  preview.innerHTML =
-    "";
+  createButton.disabled = true;
 
-
-  createButton.disabled =
-    true;
-
-
-  whatsappButton.disabled =
-    true;
-
-
-  setBridgeStatus(
-    "Miku Stickers جاهز."
-  );
+  whatsappButton.disabled = true;
 
 }
 
 
-/* =========================================
-   FILE INPUT
-========================================= */
+/* =========================
+   Select Images
+========================= */
 
 fileInput.addEventListener(
   "change",
-  async function () {
+  async () => {
 
     resetProject();
 
 
-    /*
-      الحصول على الصور
-    */
-
-    selectedFiles =
+    const files =
       Array.from(
         fileInput.files || []
       );
 
 
-    console.log(
-      "Selected files:",
-      selectedFiles
-    );
-
-
-    /* =====================================
-       التحقق من العدد
-    ===================================== */
-
     if (
-      selectedFiles.length < 3 ||
-      selectedFiles.length > 30
+      files.length < 3 ||
+      files.length > 30
     ) {
 
       setStatus(
-        `تم اختيار ${
-          selectedFiles.length
-        } صورة. اختر من 3 إلى 30 صورة.`
+        `تم اختيار ${files.length} صورة. اختر من 3 إلى 30.`
       );
 
       return;
-
     }
 
 
     try {
 
-      setStatus(
-        `تم اختيار ${
-          selectedFiles.length
-        } صورة. جاري تجهيزها...`
-      );
-
-
-      /* ===================================
-         معالجة الصور واحدة واحدة
-      =================================== */
-
       for (
         let i = 0;
-        i < selectedFiles.length;
+        i < files.length;
         i++
       ) {
 
         const file =
-          selectedFiles[i];
+          files[i];
 
+
+        /*
+          مهم:
+          هنا لا نهتم بحجم الصورة الأصلية.
+          حتى لو كانت 20MB، نحاول ضغطها.
+        */
 
         setStatus(
-          `جاري تجهيز الملصق ${
-            i + 1
-          } من ${
-            selectedFiles.length
-          }...`
-        );
-
-
-        console.log(
-          "Processing:",
-          file.name
+          `جاري تحويل الصورة ${i + 1} من ${files.length}...`
         );
 
 
         const blob =
-          await makeSticker(
-            file
-          );
+          await makeSticker(file);
 
-
-        /* ================================
-           التحقق من الحجم
-        ================================= */
-
-        if (
-          blob.size >
-          100 * 1024
-        ) {
-
-          throw new Error(
-            `الملصق ${
-              i + 1
-            } أكبر من 100KB.`
-          );
-
-        }
-
-
-        /*
-          تخزين الملصق
-        */
 
         const sticker = {
-
           blob: blob,
-
           width: 512,
-
           height: 512,
-
           size: blob.size
-
         };
 
 
@@ -638,10 +421,6 @@ fileInput.addEventListener(
           sticker
         );
 
-
-        /*
-          عرض المعاينة فورًا
-        */
 
         const card =
           createPreviewCard(
@@ -653,57 +432,28 @@ fileInput.addEventListener(
         preview.appendChild(
           card
         );
-
-
-        console.log(
-          `Sticker ${
-            i + 1
-          } ready`
-        );
-
       }
 
-
-      /* ===================================
-         اكتملت المعالجة
-      ================================= */
 
       createButton.disabled =
         false;
 
 
       setStatus(
-        `تم تجهيز ${
-          processedStickers.length
-        } ملصقات ✓`
-      );
-
-
-      console.log(
-        "Processed stickers:",
-        processedStickers
+        `تم تجهيز ${files.length} ملصقات ✓`
       );
 
 
     } catch (error) {
 
-      console.error(
-        "Sticker error:",
-        error
-      );
+      console.error(error);
 
 
       processedStickers = [];
 
-      currentPack = null;
+      createButton.disabled = true;
 
-
-      createButton.disabled =
-        true;
-
-
-      whatsappButton.disabled =
-        true;
+      whatsappButton.disabled = true;
 
 
       setStatus(
@@ -717,13 +467,47 @@ fileInput.addEventListener(
 );
 
 
-/* =========================================
-   CREATE PACK
-========================================= */
+/* =========================
+   Blob → Base64
+========================= */
+
+function blobToBase64(blob) {
+
+  return new Promise(
+    (resolve, reject) => {
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload = () => {
+
+        const result =
+          reader.result;
+
+        resolve(
+          result.split(",")[1]
+        );
+      };
+
+
+      reader.onerror =
+        reject;
+
+
+      reader.readAsDataURL(blob);
+    }
+  );
+}
+
+
+/* =========================
+   Create Pack
+========================= */
 
 createButton.addEventListener(
   "click",
-  async function () {
+  async () => {
 
     if (
       processedStickers.length < 3 ||
@@ -731,34 +515,24 @@ createButton.addEventListener(
     ) {
 
       setStatus(
-        "يجب اختيار من 3 إلى 30 صورة."
+        "يجب اختيار من 3 إلى 30 ملصقًا."
       );
 
       return;
-
     }
 
 
     try {
 
-      createButton.disabled =
-        true;
-
-
-      whatsappButton.disabled =
-        true;
+      createButton.disabled = true;
 
 
       setStatus(
-        "جاري إنشاء حزمة الملصقات..."
+        "جاري إنشاء الحزمة..."
       );
 
 
-      /*
-        تحويل الصور إلى Base64
-      */
-
-      const stickers = [];
+      const stickerData = [];
 
 
       for (
@@ -767,17 +541,13 @@ createButton.addEventListener(
         i++
       ) {
 
-        const sticker =
-          processedStickers[i];
-
-
         const base64 =
           await blobToBase64(
-            sticker.blob
+            processedStickers[i].blob
           );
 
 
-        stickers.push({
+        stickerData.push({
 
           image_data:
             base64,
@@ -786,18 +556,11 @@ createButton.addEventListener(
             ["😀"],
 
           accessibility_text:
-            `Miku Sticker ${
-              i + 1
-            }`
+            `Miku Sticker ${i + 1}`
 
         });
-
       }
 
-
-      /*
-        الغلاف = أول ملصق
-      */
 
       const trayImage =
         await blobToBase64(
@@ -807,15 +570,12 @@ createButton.addEventListener(
 
       currentPack = {
 
-        ios_app_store_link:
-          "",
+        ios_app_store_link: "",
 
-        android_play_store_link:
-          "",
+        android_play_store_link: "",
 
         identifier:
-          "miku_stickers_" +
-          Date.now(),
+          `miku_stickers_${Date.now()}`,
 
         name:
           packName.value.trim() ||
@@ -828,25 +588,8 @@ createButton.addEventListener(
           trayImage,
 
         stickers:
-          stickers
-
+          stickerData
       };
-
-
-      /*
-        تأكيد الحزمة
-      */
-
-      if (
-        currentPack.stickers.length < 3 ||
-        currentPack.stickers.length > 30
-      ) {
-
-        throw new Error(
-          "عدد الملصقات غير صحيح."
-        );
-
-      }
 
 
       whatsappButton.disabled =
@@ -854,34 +597,24 @@ createButton.addEventListener(
 
 
       setStatus(
-        "تم إنشاء الحزمة بنجاح ✓"
+        "تم إنشاء حزمة الملصقات ✓"
       );
 
 
       setBridgeStatus(
-        "الحزمة جاهزة للإرسال إلى Native Bridge."
+        "الحزمة جاهزة لـ Native Bridge."
       );
 
 
       console.log(
-        "PACK:",
+        "Miku Pack:",
         currentPack
       );
 
 
     } catch (error) {
 
-      console.error(
-        "Pack error:",
-        error
-      );
-
-
-      currentPack = null;
-
-
-      whatsappButton.disabled =
-        true;
+      console.error(error);
 
 
       setStatus(
@@ -889,72 +622,23 @@ createButton.addEventListener(
         "تعذر إنشاء الحزمة."
       );
 
-
-      setBridgeStatus("");
-
     } finally {
 
       createButton.disabled =
         false;
-
     }
 
   }
 );
 
 
-/* =========================================
-   Blob → Base64
-========================================= */
-
-function blobToBase64(blob) {
-
-  return new Promise(
-    (resolve, reject) => {
-
-      const reader =
-        new FileReader();
-
-
-      reader.onload =
-        function () {
-
-          const result =
-            reader.result;
-
-
-          const base64 =
-            result.split(",")[1];
-
-
-          resolve(
-            base64
-          );
-
-        };
-
-
-      reader.onerror =
-        reject;
-
-
-      reader.readAsDataURL(
-        blob
-      );
-
-    }
-  );
-
-}
-
-
-/* =========================================
-   WhatsApp Button
-========================================= */
+/* =========================
+   WhatsApp
+========================= */
 
 whatsappButton.addEventListener(
   "click",
-  async function () {
+  () => {
 
     if (!currentPack) {
 
@@ -963,18 +647,8 @@ whatsappButton.addEventListener(
       );
 
       return;
-
     }
 
-
-    /*
-      حاليًا Native Bridge
-      غير موجود داخل الموقع العادي.
-
-      لذلك نعرض حالة واضحة
-      بدل إعطاء المستخدم إحساس
-      أن WhatsApp استلم الحزمة.
-    */
 
     setStatus(
       "الحزمة جاهزة لـ WhatsApp ✓"
@@ -987,7 +661,7 @@ whatsappButton.addEventListener(
 
 
     console.log(
-      "Pack ready for native bridge:",
+      "Ready for WhatsApp:",
       currentPack
     );
 
@@ -995,14 +669,13 @@ whatsappButton.addEventListener(
 );
 
 
-/* =========================================
-   Initial State
-========================================= */
+/* =========================
+   Initial
+========================= */
 
 setStatus(
   "اختر من 3 إلى 30 صورة."
 );
-
 
 setBridgeStatus(
   "Miku Stickers جاهز."
