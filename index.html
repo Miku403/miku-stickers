@@ -1,14 +1,20 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
+>
 
 <title>𝘔𝘐𝘒𝘜 𝘚𝘛𝘐𝘊𝘒𝘌𝘙𝘚</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <style>
+
 *{
   box-sizing:border-box;
 }
@@ -64,10 +70,12 @@ h1{
   min-height:150px;
   border:2px dashed #aaa;
   border-radius:18px;
+
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
+
   text-align:center;
   cursor:pointer;
   overflow:hidden;
@@ -88,6 +96,7 @@ h1{
   width:100%;
   height:100%;
   opacity:0;
+  cursor:pointer;
 }
 
 .count{
@@ -138,16 +147,19 @@ button{
 
 button:disabled{
   opacity:.45;
+  cursor:not-allowed;
 }
 
 .status{
   text-align:center;
   margin-top:15px;
   font-weight:bold;
-  line-height:1.6;
+  line-height:1.7;
 }
 
-/* النتائج */
+/* =========================
+   النتائج
+========================= */
 
 #resultSection{
   display:none;
@@ -214,20 +226,26 @@ button:disabled{
   font-size:13px;
   line-height:1.7;
 }
+
 </style>
+
 </head>
 
 <body>
 
 <div class="container">
 
-<h1>𝘔𝘐𝘒𝘜 𝘚𝘛𝘐𝘊𝘒𝘌𝘙𝘚</h1>
+<h1>
+𝘔𝘐𝘒𝘜 𝘚𝘛𝘐𝘊𝘒𝘌𝘙𝘚
+</h1>
 
 <div class="subtitle">
 حوّل صورك إلى ملصقات 🎀
 </div>
 
+
 <div class="card">
+
 
 <label class="title">
 اسم حزمة الملصقات
@@ -240,6 +258,7 @@ placeholder="مثلاً: Miku Stickers"
 maxlength="128"
 >
 
+
 <label class="upload">
 
 <input
@@ -249,7 +268,9 @@ accept="image/*"
 multiple
 >
 
-<strong>🖼️ اختر الصور</strong>
+<strong>
+🖼️ اختر الصور
+</strong>
 
 <span>
 من 3 إلى 30 صورة
@@ -257,73 +278,107 @@ multiple
 
 </label>
 
+
 <div
 id="count"
 class="count">
 </div>
+
 
 <div
 id="preview"
 class="preview">
 </div>
 
+
 <button
 id="convertBtn"
 disabled>
+
 ⚙️ تحويل إلى ملصقات
+
 </button>
+
 
 <button
 id="packBtn"
 disabled>
+
 🎀 إنشاء حزمة .wastickers
+
 </button>
+
 
 <div
 id="status"
 class="status">
 </div>
 
+
 <div
 id="resultSection">
+
 
 <div class="resultTitle">
 🎀 ملصقاتك الجاهزة
 </div>
+
 
 <div
 id="stickers"
 class="stickers">
 </div>
 
+
 <div class="packInfo">
+
 الحزمة تحتوي على:
+
 <br>
-• ملصقات WebP بحجم 512×512
+
+• ملصقات WebP
+
 <br>
-• ملف غلاف PNG بحجم 96×96
+
+• مقاس أصلي يصل إلى 512×512
+
 <br>
+
+• حجم الملصق ≤100KB
+
+<br>
+
+• غلاف PNG بحجم 96×96
+
+<br>
+
 • اسم الحزمة
+
 <br>
+
 • اسم الناشر
-</div>
 
 </div>
+
+
+</div>
+
 
 <div class="info">
 
-كل ملصق يتم تحويله إلى
-512×512 WebP.
+كل صورة يتم تحويلها إلى
+WebP.
 
-إذا كان حجم الملصق أقل من
+إذا كان حجمها أقل من
 <strong>100KB</strong>
-فلا يتم ضغطه.
+فلن يتم ضغطها.
 
-أما إذا تجاوز
+إذا تجاوزت
 <strong>100KB</strong>
-فيتم ضغطه تدريجيًا حتى يصبح مناسبًا.
+سيتم البحث تلقائيًا عن أفضل جودة ممكنة تحت الحد.
 
 </div>
+
 
 </div>
 
@@ -332,35 +387,59 @@ class="stickers">
 
 <script>
 
+
+/* =========================
+   العناصر
+========================= */
+
 const fileInput =
-document.getElementById("fileInput");
+document.getElementById(
+"fileInput"
+);
 
 const packName =
-document.getElementById("packName");
+document.getElementById(
+"packName"
+);
 
 const preview =
-document.getElementById("preview");
+document.getElementById(
+"preview"
+);
 
 const count =
-document.getElementById("count");
+document.getElementById(
+"count"
+);
 
 const convertBtn =
-document.getElementById("convertBtn");
+document.getElementById(
+"convertBtn"
+);
 
 const packBtn =
-document.getElementById("packBtn");
+document.getElementById(
+"packBtn"
+);
 
 const status =
-document.getElementById("status");
+document.getElementById(
+"status"
+);
 
 const resultSection =
-document.getElementById("resultSection");
+document.getElementById(
+"resultSection"
+);
 
 const stickersContainer =
-document.getElementById("stickers");
+document.getElementById(
+"stickers"
+);
 
 
 let files = [];
+
 let stickers = [];
 
 
@@ -377,11 +456,15 @@ Array.from(
 fileInput.files || []
 );
 
+
 selected =
 selected.filter(
 file =>
-file.type.startsWith("image/")
+file.type.startsWith(
+"image/"
+)
 );
+
 
 if(selected.length > 30){
 
@@ -389,6 +472,7 @@ selected =
 selected.slice(0,30);
 
 }
+
 
 files = selected;
 
@@ -400,6 +484,8 @@ resultSection.style.display =
 "none";
 
 packBtn.disabled = true;
+
+status.textContent = "";
 
 
 if(files.length === 0){
@@ -435,23 +521,33 @@ files.forEach(
 file => {
 
 const item =
-document.createElement("div");
+document.createElement(
+"div"
+);
 
 item.className =
 "preview-item";
 
 
 const img =
-document.createElement("img");
+document.createElement(
+"img"
+);
+
 
 const url =
-URL.createObjectURL(file);
+URL.createObjectURL(
+file
+);
 
 img.src = url;
 
+
 img.onload = () => {
 
-URL.revokeObjectURL(url);
+URL.revokeObjectURL(
+url
+);
 
 };
 
@@ -489,65 +585,65 @@ quality
 
 
 /* =========================
-   تحويل الصورة
+   رسم الصورة
 ========================= */
 
-async function makeSticker(file){
-
-const image =
-await createImageBitmap(file);
-
-const originalWidth =
-image.width;
-
-const originalHeight =
-image.height;
-
+function drawImageToCanvas(
+image,
+size
+){
 
 const canvas =
-document.createElement("canvas");
+document.createElement(
+"canvas"
+);
 
-canvas.width = 512;
-canvas.height = 512;
+canvas.width = size;
+
+canvas.height = size;
+
 
 const ctx =
 canvas.getContext("2d");
 
+
 ctx.clearRect(
 0,
 0,
-512,
-512
+size,
+size
 );
 
 
-/*
-  هامش بسيط حول الملصق
-*/
+const margin =
+Math.round(
+size * 0.03
+);
 
-const margin = 16;
 
-const inner =
-512 - margin * 2;
+const available =
+size - margin * 2;
 
 
 const scale =
 Math.min(
-inner / originalWidth,
-inner / originalHeight
+available / image.width,
+available / image.height
 );
 
+
 const width =
-originalWidth * scale;
+image.width * scale;
 
 const height =
-originalHeight * scale;
+image.height * scale;
+
 
 const x =
-(512 - width) / 2;
+(size - width) / 2;
 
 const y =
-(512 - height) / 2;
+(size - height) / 2;
 
 
 ctx.drawImage(
@@ -558,16 +654,64 @@ width,
 height
 );
 
-image.close();
+
+return canvas;
+
+}
+
+
+/* =========================
+   تحويل الصورة
+========================= */
+
+async function makeSticker(
+file
+){
+
+const image =
+await createImageBitmap(
+file
+);
 
 
 const MAX_SIZE =
 100 * 1024;
 
 
-/* =========================
-   أول محاولة
-========================= */
+/*
+  الأحجام التي سنجربها.
+
+  نبدأ 512×512،
+  وإذا احتجنا نصغر تدريجيًا.
+*/
+
+const sizes = [
+512,
+480,
+448,
+416,
+384,
+352,
+320,
+288,
+256
+];
+
+
+for(
+const size of sizes
+){
+
+const canvas =
+drawImageToCanvas(
+image,
+size
+);
+
+
+/*
+  أولًا نجرب جودة عالية جدًا.
+*/
 
 let blob =
 await canvasToWebP(
@@ -577,28 +721,43 @@ canvas,
 
 
 /*
-  إذا كان الحجم مناسبًا،
-  لا نضغط أكثر.
+  إذا كانت الصورة تحت 100KB
+  من البداية، نرجعها فورًا.
 */
 
 if(
 blob.size <= MAX_SIZE
 ){
 
+image.close();
+
 return blob;
 
 }
 
 
-/* =========================
-   ضغط تدريجي
-========================= */
+/*
+  Binary Search
+  للعثور على أعلى جودة
+  تحقق شرط 100KB.
+*/
+
+let low = 0.10;
+
+let high = 0.90;
+
+let bestBlob = null;
+
 
 for(
-let quality = 0.88;
-quality >= 0.20;
-quality -= 0.04
+let i = 0;
+i < 9;
+i++
 ){
+
+const quality =
+(low + high) / 2;
+
 
 blob =
 await canvasToWebP(
@@ -611,142 +770,95 @@ if(
 blob.size <= MAX_SIZE
 ){
 
-return blob;
+bestBlob = blob;
+
+low = quality;
+
+}else{
+
+high = quality;
 
 }
 
 }
-
-
-/* =========================
-   محاولة أخيرة
-========================= */
-
-blob =
-await canvasToWebP(
-canvas,
-0.15
-);
-
-
-if(
-blob.size <= MAX_SIZE
-){
-
-return blob;
-
-}
-
-
-/* =========================
-   تصغير الأبعاد كحل أخير
-========================= */
-
-for(
-let size = 448;
-size >= 256;
-size -= 32
-){
-
-const smaller =
-document.createElement("canvas");
-
-smaller.width = size;
-smaller.height = size;
-
-
-const smallerCtx =
-smaller.getContext("2d");
-
-smallerCtx.clearRect(
-0,
-0,
-size,
-size
-);
-
-
-const scale =
-Math.min(
-(size - 16) / originalWidth,
-(size - 16) / originalHeight
-);
-
-const width =
-originalWidth * scale;
-
-const height =
-originalHeight * scale;
-
-const x =
-(size - width) / 2;
-
-const y =
-(size - height) / 2;
 
 
 /*
-  نعيد رسم الصورة الأصلية
-  بالحجم الأصغر.
+  إذا وجدنا جودة مناسبة،
+  نستخدمها.
 */
 
-smallerCtx.drawImage(
-canvas,
-0,
-0,
-512,
-512,
-0,
-0,
-size,
-size
+if(bestBlob){
+
+image.close();
+
+return bestBlob;
+
+}
+
+}
+
+
+/*
+  كحل أخير جدًا:
+  256×256 وجودة منخفضة.
+*/
+
+const finalCanvas =
+drawImageToCanvas(
+image,
+256
 );
 
 
-blob =
+const finalBlob =
 await canvasToWebP(
-smaller,
-0.70
+finalCanvas,
+0.05
 );
 
 
-if(
-blob.size <= MAX_SIZE
-){
-
-return blob;
-
-}
-
-}
+image.close();
 
 
-throw new Error(
-"تعذر ضغط الصورة إلى أقل من 100KB"
-);
+/*
+  حتى لو كانت أكبر بقليل،
+  نرجعها بدل ما نوقف العملية.
+*/
+
+return finalBlob;
 
 }
 
 
 /* =========================
-   تحويل الغلاف
+   الغلاف
 ========================= */
 
-async function makeCover(file){
+async function makeCover(
+file
+){
 
 const image =
-await createImageBitmap(file);
+await createImageBitmap(
+file
+);
 
 
 const canvas =
-document.createElement("canvas");
+document.createElement(
+"canvas"
+);
+
 
 canvas.width = 96;
+
 canvas.height = 96;
 
 
 const ctx =
 canvas.getContext("2d");
+
 
 ctx.clearRect(
 0,
@@ -762,11 +874,13 @@ Math.min(
 96 / image.height
 );
 
+
 const width =
 image.width * scale;
 
 const height =
 image.height * scale;
+
 
 const x =
 (96 - width) / 2;
@@ -783,29 +897,26 @@ width,
 height
 );
 
+
 image.close();
 
 
-const blob =
-await new Promise(
+return new Promise(
 resolve => {
 
 canvas.toBlob(
-result =>
-resolve(result),
+blob =>
+resolve(blob),
 "image/png"
 );
 
 });
 
-
-return blob;
-
 }
 
 
 /* =========================
-   مشاركة ملصق
+   مشاركة الملصق
 ========================= */
 
 async function shareSticker(
@@ -815,7 +926,9 @@ index
 
 const file =
 new File(
-[sticker.blob],
+[
+sticker.blob
+],
 sticker.name,
 {
 type:"image/webp"
@@ -838,26 +951,37 @@ await navigator.share({
 title:
 `Sticker ${index + 1}`,
 
-files:[file]
+files:[
+file
+]
 
 });
 
 }else{
+
 
 const url =
 URL.createObjectURL(
 sticker.blob
 );
 
+
 const link =
-document.createElement("a");
+document.createElement(
+"a"
+);
+
 
 link.href = url;
 
 link.download =
 sticker.name;
 
-document.body.appendChild(link);
+
+document.body.appendChild(
+link
+);
+
 
 link.click();
 
@@ -865,13 +989,18 @@ link.remove();
 
 
 setTimeout(
-()=>{
-URL.revokeObjectURL(url);
+() => {
+
+URL.revokeObjectURL(
+url
+);
+
 },
 2000
 );
 
 }
+
 
 }catch(error){
 
@@ -895,35 +1024,48 @@ console.error(error);
 
 function showStickers(){
 
-stickersContainer.innerHTML = "";
+stickersContainer.innerHTML =
+"";
+
 
 resultSection.style.display =
 "block";
 
 
 stickers.forEach(
-(sticker,index)=>{
+(sticker,index) => {
+
 
 const box =
-document.createElement("div");
+document.createElement(
+"div"
+);
+
 
 box.className =
 "sticker";
 
 
 const img =
-document.createElement("img");
+document.createElement(
+"img"
+);
+
 
 const url =
 URL.createObjectURL(
 sticker.blob
 );
 
+
 img.src = url;
 
 
 const shareButton =
-document.createElement("button");
+document.createElement(
+"button"
+);
+
 
 shareButton.textContent =
 "📤 مشاركة";
@@ -931,19 +1073,25 @@ shareButton.textContent =
 
 shareButton.addEventListener(
 "click",
-()=>{
+() => {
+
 shareSticker(
 sticker,
 index
 );
+
 });
 
 
 const size =
-document.createElement("div");
+document.createElement(
+"div"
+);
+
 
 size.className =
 "size";
+
 
 size.textContent =
 `${(
@@ -959,6 +1107,7 @@ shareButton
 
 box.appendChild(size);
 
+
 stickersContainer.appendChild(
 box
 );
@@ -969,7 +1118,7 @@ box
 
 
 /* =========================
-   تحويل الصور
+   تحويل جميع الصور
 ========================= */
 
 convertBtn.addEventListener(
@@ -977,7 +1126,9 @@ convertBtn.addEventListener(
 async function(){
 
 if(files.length < 3){
+
 return;
+
 }
 
 
@@ -985,15 +1136,20 @@ convertBtn.disabled = true;
 
 packBtn.disabled = true;
 
+
 stickers = [];
 
-stickersContainer.innerHTML = "";
+
+stickersContainer.innerHTML =
+"";
+
 
 resultSection.style.display =
 "none";
 
 
 try{
+
 
 for(
 let i = 0;
@@ -1016,7 +1172,10 @@ stickers.push({
 name:
 `sticker_${String(
 i + 1
-).padStart(2,"0")}.webp`,
+).padStart(
+2,
+"0"
+)}.webp`,
 
 blob:
 blob
@@ -1032,6 +1191,7 @@ status.textContent =
 
 showStickers();
 
+
 packBtn.disabled = false;
 
 
@@ -1039,8 +1199,9 @@ packBtn.disabled = false;
 
 console.error(error);
 
+
 status.textContent =
-"حدث خطأ: " +
+"حدث خطأ أثناء التحويل: " +
 error.message;
 
 }
@@ -1052,15 +1213,19 @@ convertBtn.disabled = false;
 
 
 /* =========================
-   إنشاء حزمة WASTICKERS
+   إنشاء WASTICKERS
 ========================= */
 
 packBtn.addEventListener(
 "click",
 async function(){
 
-if(stickers.length < 3){
+if(
+stickers.length < 3
+){
+
 return;
+
 }
 
 
@@ -1078,24 +1243,27 @@ title =
 
 packBtn.disabled = true;
 
+
 status.textContent =
 "🎀 جاري إنشاء الحزمة...";
 
 
 try{
 
+
 const zip =
 new JSZip();
 
 
 /*
-  بيانات الحزمة
+  معلومات الحزمة
 */
 
 zip.file(
 "title.txt",
 title
 );
+
 
 zip.file(
 "author.txt",
@@ -1112,6 +1280,7 @@ await makeCover(
 files[0]
 );
 
+
 zip.file(
 "cover.png",
 cover
@@ -1119,7 +1288,7 @@ cover
 
 
 /*
-  الملصقات
+  إضافة الملصقات
 */
 
 const timestamp =
@@ -1147,11 +1316,11 @@ stickers[i].blob
 
 
 /*
-  ضغط الحزمة
+  إنشاء الأرشيف
 */
 
 status.textContent =
-"📦 تجهيز الملف النهائي...";
+"📦 تجهيز ملف الحزمة...";
 
 
 const wastickers =
@@ -1169,7 +1338,7 @@ level:6
 
 
 /*
-  تحميل الملف
+  تحميل الحزمة
 */
 
 const url =
@@ -1177,15 +1346,24 @@ URL.createObjectURL(
 wastickers
 );
 
+
 const link =
-document.createElement("a");
+document.createElement(
+"a"
+);
+
 
 link.href = url;
+
 
 link.download =
 `${slugify(title)}.wastickers`;
 
-document.body.appendChild(link);
+
+document.body.appendChild(
+link
+);
+
 
 link.click();
 
@@ -1193,20 +1371,25 @@ link.remove();
 
 
 setTimeout(
-()=>{
-URL.revokeObjectURL(url);
+() => {
+
+URL.revokeObjectURL(
+url
+);
+
 },
 3000
 );
 
 
 status.textContent =
-"✅ تم إنشاء حزمة .wastickers 🎀";
+"✅ تم إنشاء حزمة .wastickers بنجاح 🎀";
 
 
 }catch(error){
 
 console.error(error);
+
 
 status.textContent =
 "❌ فشل إنشاء الحزمة: " +
@@ -1224,7 +1407,9 @@ packBtn.disabled = false;
    تنظيف اسم الملف
 ========================= */
 
-function slugify(text){
+function slugify(
+text
+){
 
 return text
 .toLowerCase()
