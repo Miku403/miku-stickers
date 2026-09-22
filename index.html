@@ -135,8 +135,18 @@ button{
   cursor:pointer;
 }
 
+button:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
 #convertBtn{
   background:#222;
+  color:white;
+}
+
+#directBtn{
+  background:#25D366;
   color:white;
 }
 
@@ -145,21 +155,12 @@ button{
   color:white;
 }
 
-button:disabled{
-  opacity:.45;
-  cursor:not-allowed;
-}
-
 .status{
   text-align:center;
   margin-top:15px;
   font-weight:bold;
   line-height:1.7;
 }
-
-/* =========================
-   النتائج
-========================= */
 
 #resultSection{
   display:none;
@@ -227,6 +228,16 @@ button:disabled{
   line-height:1.7;
 }
 
+.experimental{
+  margin-top:10px;
+  padding:12px;
+  border-radius:12px;
+  background:#fff8df;
+  color:#765d00;
+  font-size:12px;
+  line-height:1.7;
+}
+
 </style>
 
 </head>
@@ -275,15 +286,9 @@ button:disabled{
 
 </label>
 
-<div
-  id="count"
-  class="count">
-</div>
+<div id="count" class="count"></div>
 
-<div
-  id="preview"
-  class="preview">
-</div>
+<div id="preview" class="preview"></div>
 
 <button
   id="convertBtn"
@@ -293,16 +298,20 @@ button:disabled{
 </button>
 
 <button
+  id="directBtn"
+  disabled
+>
+🧪 تجربة الإضافة المباشرة إلى WhatsApp
+</button>
+
+<button
   id="packBtn"
   disabled
 >
-🎀 إنشاء حزمة .wastickers
+📦 إنشاء حزمة .wastickers
 </button>
 
-<div
-  id="status"
-  class="status">
-</div>
+<div id="status" class="status"></div>
 
 <div id="resultSection">
 
@@ -342,6 +351,17 @@ button:disabled{
 <br>
 
 • اسم الناشر
+
+</div>
+
+<div class="experimental">
+
+🧪 زر الإضافة المباشرة تجريبي.
+
+الموقع سيجهز بيانات الحزمة بصيغة قريبة من بنية WhatsApp الرسمية ويحاول فتح
+WhatsApp.
+
+إذا رفض Safari الوصول إلى آلية Pasteboard الخاصة بواتساب، فلن تتم الإضافة المباشرة من المتصفح.
 
 </div>
 
@@ -388,6 +408,9 @@ document.getElementById("count");
 
 const convertBtn =
 document.getElementById("convertBtn");
+
+const directBtn =
+document.getElementById("directBtn");
 
 const packBtn =
 document.getElementById("packBtn");
@@ -441,6 +464,8 @@ stickersContainer.innerHTML = "";
 
 resultSection.style.display =
 "none";
+
+directBtn.disabled = true;
 
 packBtn.disabled = true;
 
@@ -551,11 +576,6 @@ const MAX_SIZE =
 100 * 1024;
 
 
-/*
-  Canvas ثابت:
-  512×512 بالضبط
-*/
-
 const canvas =
 document.createElement("canvas");
 
@@ -567,10 +587,6 @@ const ctx =
 canvas.getContext("2d");
 
 
-/*
-  تأكيد الشفافية
-*/
-
 ctx.clearRect(
 0,
 0,
@@ -578,11 +594,6 @@ ctx.clearRect(
 512
 );
 
-
-/*
-  حساب أبعاد الصورة
-  مع الحفاظ على النسبة
-*/
 
 const margin = 16;
 
@@ -611,11 +622,6 @@ const y =
 (512 - height) / 2;
 
 
-/*
-  رسم الصورة داخل
-  Canvas 512×512
-*/
-
 ctx.drawImage(
 image,
 x,
@@ -628,21 +634,12 @@ height
 image.close();
 
 
-/* =========================
-   محاولة بجودة عالية
-========================= */
-
 let blob =
 await canvasToWebP(
 canvas,
 0.92
 );
 
-
-/*
-  إذا كانت أقل من 100KB
-  نستخدمها مباشرة.
-*/
 
 if(
 blob &&
@@ -653,11 +650,6 @@ return blob;
 
 }
 
-
-/* =========================
-   البحث عن أعلى جودة
-   تحت 100KB
-========================= */
 
 let low = 0.01;
 
@@ -701,20 +693,12 @@ high = quality;
 }
 
 
-/*
-  وجدنا نسخة مناسبة
-*/
-
 if(bestBlob){
 
 return bestBlob;
 
 }
 
-
-/* =========================
-   آخر محاولة
-========================= */
 
 blob =
 await canvasToWebP(
@@ -737,19 +721,13 @@ file
 ){
 
 const image =
-await createImageBitmap(
-file
-);
+await createImageBitmap(file);
 
 
 const canvas =
-document.createElement(
-"canvas"
-);
-
+document.createElement("canvas");
 
 canvas.width = 96;
-
 canvas.height = 96;
 
 
@@ -813,7 +791,46 @@ resolve(blob),
 
 
 /* =========================
-   مشاركة الملصق
+   Blob → Base64
+========================= */
+
+function blobToBase64(
+blob
+){
+
+return new Promise(
+(resolve,reject) => {
+
+const reader =
+new FileReader();
+
+reader.onloadend =
+() => {
+
+const result =
+reader.result;
+
+const base64 =
+result.split(",")[1];
+
+resolve(base64);
+
+};
+
+reader.onerror =
+reject;
+
+reader.readAsDataURL(
+blob
+);
+
+});
+
+}
+
+
+/* =========================
+   مشاركة ملصق منفرد
 ========================= */
 
 async function shareSticker(
@@ -864,7 +881,6 @@ sticker.blob
 
 const link =
 document.createElement("a");
-
 
 link.href = url;
 
@@ -1012,6 +1028,8 @@ return;
 
 convertBtn.disabled = true;
 
+directBtn.disabled = true;
+
 packBtn.disabled = true;
 
 stickers = [];
@@ -1066,6 +1084,8 @@ status.textContent =
 showStickers();
 
 
+directBtn.disabled = false;
+
 packBtn.disabled = false;
 
 
@@ -1081,6 +1101,213 @@ error.message;
 
 
 convertBtn.disabled = false;
+
+});
+
+
+/* =========================
+   التجربة المباشرة
+========================= */
+
+directBtn.addEventListener(
+"click",
+async function(){
+
+if(
+stickers.length < 3
+){
+
+return;
+
+}
+
+
+directBtn.disabled = true;
+
+packBtn.disabled = true;
+
+
+try{
+
+status.textContent =
+"🧪 تجهيز بيانات WhatsApp...";
+
+
+/*
+  إنشاء الغلاف PNG
+*/
+
+const coverBlob =
+await makeCover(
+files[0]
+);
+
+
+/*
+  تحويل الغلاف إلى Base64
+*/
+
+const trayImage =
+await blobToBase64(
+coverBlob
+);
+
+
+/*
+  تجهيز الملصقات
+*/
+
+const stickerArray = [];
+
+
+for(
+let i = 0;
+i < stickers.length;
+i++
+){
+
+status.textContent =
+`🧪 تجهيز الملصق ${i + 1} من ${stickers.length}...`;
+
+
+const imageData =
+await blobToBase64(
+stickers[i].blob
+);
+
+
+stickerArray.push({
+
+image_data:
+imageData,
+
+emojis:
+["🎀"],
+
+accessibility_text:
+`Miku sticker ${i + 1}`
+
+});
+
+}
+
+
+/*
+  إنشاء Identifier
+*/
+
+const identifier =
+"miku_stickers_" +
+Date.now();
+
+
+/*
+  نفس بنية JSON
+  المستخدمة في API الرسمي
+*/
+
+const whatsappPack = {
+
+ios_app_store_link:
+"",
+
+android_play_store_link:
+"",
+
+identifier:
+identifier,
+
+name:
+packName.value.trim() ||
+"Miku Stickers",
+
+publisher:
+"Miku Stickers",
+
+tray_image:
+trayImage,
+
+stickers:
+stickerArray
+
+};
+
+
+/*
+  تحويل JSON إلى نص
+*/
+
+const jsonText =
+JSON.stringify(
+whatsappPack
+);
+
+
+/*
+  عرض الحجم في Console
+  للاختبار فقط
+*/
+
+console.log(
+"WhatsApp Sticker Pack JSON:",
+whatsappPack
+);
+
+console.log(
+"JSON size:",
+jsonText.length
+);
+
+
+/*
+  محاولة فتح WhatsApp
+*/
+
+status.textContent =
+"📱 جاري محاولة فتح WhatsApp...";
+
+
+/*
+  هذا هو URL Scheme الرسمي
+  المستخدم من تكامل iOS
+*/
+
+window.location.href =
+"whatsapp://stickerPack";
+
+
+/*
+  إذا لم يستجب WhatsApp
+*/
+
+setTimeout(
+() => {
+
+status.textContent =
+"⚠️ تم تجهيز الحزمة، لكن Safari لم يسمح للموقع بإرسال بيانات Pasteboard الخاصة بواتساب. افتح Console إذا أردت فحص التجربة.";
+
+directBtn.disabled = false;
+
+packBtn.disabled = false;
+
+},
+2500
+);
+
+
+}catch(error){
+
+console.error(error);
+
+status.textContent =
+"❌ حدث خطأ أثناء تجهيز التجربة: " +
+error.message;
+
+directBtn.disabled = false;
+
+packBtn.disabled = false;
+
+}
 
 });
 
@@ -1127,10 +1354,6 @@ const zip =
 new JSZip();
 
 
-/*
-  معلومات الحزمة
-*/
-
 zip.file(
 "title.txt",
 title
@@ -1143,10 +1366,6 @@ zip.file(
 );
 
 
-/*
-  الغلاف
-*/
-
 const cover =
 await makeCover(
 files[0]
@@ -1158,10 +1377,6 @@ zip.file(
 cover
 );
 
-
-/*
-  إضافة الملصقات
-*/
 
 const timestamp =
 Math.floor(
@@ -1187,10 +1402,6 @@ stickers[i].blob
 }
 
 
-/*
-  إنشاء الملف
-*/
-
 status.textContent =
 "📦 تجهيز ملف الحزمة...";
 
@@ -1208,10 +1419,6 @@ level:6
 
 });
 
-
-/*
-  تحميل .wastickers
-*/
 
 const url =
 URL.createObjectURL(
