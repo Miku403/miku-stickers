@@ -31,7 +31,9 @@
 
   <main class="container">
 
+    <!-- HEADER -->
     <header>
+
       <h1>
         𝘔𝘐𝘒𝘜 𝘚𝘛𝘐𝘊𝘒𝘌𝘙𝘚
       </h1>
@@ -39,13 +41,14 @@
       <p>
         حوّل صورك إلى ملصقات WhatsApp
       </p>
+
     </header>
 
 
+    <!-- MAIN CARD -->
     <section class="card">
 
-      <!-- اسم الحزمة -->
-
+      <!-- PACK NAME -->
       <div class="field">
 
         <label for="packName">
@@ -63,8 +66,7 @@
       </div>
 
 
-      <!-- رفع الصور -->
-
+      <!-- UPLOAD -->
       <label
         class="upload"
         for="fileInput"
@@ -94,8 +96,7 @@
       >
 
 
-      <!-- الحالة -->
-
+      <!-- STATUS -->
       <div
         id="status"
         class="status"
@@ -105,17 +106,16 @@
       </div>
 
 
-      <!-- المعاينة -->
-
+      <!-- PREVIEW -->
       <section
         id="preview"
         class="preview"
         aria-label="معاينة الملصقات"
-      ></section>
+      >
+      </section>
 
 
-      <!-- إنشاء الحزمة -->
-
+      <!-- CREATE -->
       <button
         id="createButton"
         type="button"
@@ -125,8 +125,7 @@
       </button>
 
 
-      <!-- حالة الـ Bridge -->
-
+      <!-- BRIDGE STATUS -->
       <div
         id="bridgeStatus"
         class="bridge-status"
@@ -136,8 +135,7 @@
       </div>
 
 
-      <!-- WhatsApp -->
-
+      <!-- EXPORT -->
       <button
         id="whatsappButton"
         class="secondary"
@@ -150,8 +148,7 @@
     </section>
 
 
-    <!-- معلومات -->
-
+    <!-- INFO -->
     <section class="info">
 
       <div class="info-item">
@@ -195,6 +192,7 @@
     </section>
 
 
+    <!-- FOOTER -->
     <footer>
 
       <p>
@@ -206,12 +204,21 @@
   </main>
 
 
-  <!-- مهم:
-       لا نستخدم type="module" هنا
-       لتجنب مشكلة التحميل السابقة.
-  -->
+  <!-- ==================================================
+       JSZip
+       يجب تحميله قبل app.js
+       ================================================== -->
 
-    <script type="module" src="js/app.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"
+  ></script>
+
+
+  <!-- APP -->
+  <script
+    type="module"
+    src="js/app.js"
+  ></script>
 
 </body>
 
