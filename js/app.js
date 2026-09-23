@@ -6,16 +6,42 @@
    3 - 30 files
 ========================================= */
 
-const fileInput = document.getElementById("fileInput");
-const preview = document.getElementById("preview");
-const status = document.getElementById("status");
-const createButton = document.getElementById("createButton");
-const whatsappButton = document.getElementById("whatsappButton");
-const bridgeStatus = document.getElementById("bridgeStatus");
+import { encode as encodeWebP } from
+  "https://esm.sh/@jsquash/webp@1.5.0";
+
+
+/* =========================================
+   ELEMENTS
+========================================= */
+
+const fileInput =
+  document.getElementById("fileInput");
+
+const preview =
+  document.getElementById("preview");
+
+const status =
+  document.getElementById("status");
+
+const createButton =
+  document.getElementById("createButton");
+
+const whatsappButton =
+  document.getElementById("whatsappButton");
+
+const bridgeStatus =
+  document.getElementById("bridgeStatus");
+
+
+/* =========================================
+   SETTINGS
+========================================= */
 
 const MIN_STICKERS = 3;
 const MAX_STICKERS = 30;
-const MAX_STATIC_SIZE = 100 * 1024;
+
+const MAX_STATIC_SIZE =
+  100 * 1024;
 
 let selectedFiles = [];
 let generatedFiles = [];
@@ -51,7 +77,11 @@ function formatBytes(bytes) {
     return `${(bytes / 1024).toFixed(1)} KB`;
   }
 
-  return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+  return `${(
+    bytes /
+    1024 /
+    1024
+  ).toFixed(2)} MB`;
 }
 
 
@@ -71,7 +101,9 @@ function isStaticImage(file) {
     file.type === "image/png" ||
     file.type === "image/jpeg" ||
     file.type === "image/webp" ||
-    /\.(png|jpe?g|webp)$/i.test(file.name)
+    /\.(png|jpe?g|webp)$/i.test(
+      file.name
+    )
   );
 }
 
@@ -149,8 +181,8 @@ function renderPreview(files) {
 
     img.onload = () => {
       /*
-       * لا نحذف URL الخاص بالـGIF
-       * مباشرة حتى تستمر المعاينة.
+       * GIF يحتاج أن يبقى Object URL
+       * متاحًا أثناء المعاينة.
        */
       if (!isGIF(file)) {
         revokeURL(url);
@@ -191,9 +223,8 @@ fileInput.addEventListener(
     selectedFiles = [];
     generatedFiles = [];
 
-    whatsappButton.disabled = true;
-
-    /* لا توجد ملفات */
+    whatsappButton.disabled =
+      true;
 
     if (!files.length) {
       preview.innerHTML = "";
@@ -211,9 +242,6 @@ fileInput.addEventListener(
 
       return;
     }
-
-
-    /* العدد غير صحيح */
 
     if (
       files.length <
@@ -236,9 +264,6 @@ fileInput.addEventListener(
 
       return;
     }
-
-
-    /* فحص الأنواع */
 
     const unsupported =
       files.filter(
@@ -263,9 +288,6 @@ fileInput.addEventListener(
       return;
     }
 
-
-    /* كل شيء سليم */
-
     selectedFiles = files;
 
     renderPreview(
@@ -280,7 +302,6 @@ fileInput.addEventListener(
 
     const imageCount =
       files.length - gifCount;
-
 
     if (
       gifCount > 0 &&
@@ -353,10 +374,13 @@ function loadImage(file) {
 
 
 /* =========================================
-   CREATE 512×512 CANVAS
+   CREATE 512×512 IMAGE DATA
 ========================================= */
 
-async function imageToCanvas(file) {
+async function imageToImageData(
+  file,
+  contentScale = 1
+) {
   const img =
     await loadImage(file);
 
@@ -390,11 +414,11 @@ async function imageToCanvas(file) {
   );
 
   /*
-   * نحافظ على نسبة الصورة
-   * ونضعها داخل 512×512.
+   * نحافظ على نسبة أبعاد
+   * الصورة الأصلية.
    */
 
-  const scale =
+  const baseScale =
     Math.min(
       512 / img.width,
       512 / img.height
@@ -402,12 +426,16 @@ async function imageToCanvas(file) {
 
   const width =
     Math.round(
-      img.width * scale
+      img.width *
+      baseScale *
+      contentScale
     );
 
   const height =
     Math.round(
-      img.height * scale
+      img.height *
+      baseScale *
+      contentScale
     );
 
   const x =
@@ -428,88 +456,72 @@ async function imageToCanvas(file) {
     height
   );
 
-  return canvas;
+  return ctx.getImageData(
+    0,
+    0,
+    512,
+    512
+  );
 }
 
 
 /* =========================================
-   WEBP ENCODER
+   ENCODE WEBP WITH JSQUASH
 ========================================= */
 
-function canvasToWebP(
-  canvas,
+async function encodeImageData(
+  imageData,
   quality
 ) {
-  return new Promise(
-    (resolve, reject) => {
-      canvas.toBlob(
-        blob => {
-          if (!blob) {
-            reject(
-              new Error(
-                "تعذر إنشاء WebP."
-              )
-            );
+  const buffer =
+    await encodeWebP(
+      imageData,
+      {
+        quality: quality,
+        method: 4
+      }
+    );
 
-            return;
-          }
+  if (
+    !(buffer instanceof ArrayBuffer)
+  ) {
+    throw new Error(
+      "لم ترجع مكتبة WebP ملفًا صالحًا."
+    );
+  }
 
-          /*
-           * بعض المتصفحات قد لا تدعم WebP.
-           * نتحقق من النوع الفعلي.
-           */
+  if (
+    buffer.byteLength === 0
+  ) {
+    throw new Error(
+      "ملف WebP الناتج فارغ."
+    );
+  }
 
-          if (
-            blob.type !==
-            "image/webp"
-          ) {
-            reject(
-              new Error(
-                "المتصفح لم ينشئ WebP فعليًا."
-              )
-            );
-
-            return;
-          }
-
-          resolve(blob);
-        },
-        "image/webp",
-        quality
-      );
+  return new Blob(
+    [buffer],
+    {
+      type: "image/webp"
     }
   );
 }
 
 
 /* =========================================
-   SMART STATIC STICKER COMPRESSION
-   ========================================= */
+   SMART WEBP COMPRESSION
+========================================= */
 
-async function createStaticSticker(file) {
-  const originalCanvas =
-    await imageToCanvas(file);
-
-  /*
-   * نبقي الـCanvas دائمًا 512×512.
-   *
-   * بدل تصغير أبعاد الملف النهائي،
-   * نصغر محتوى الصورة داخل الـCanvas.
-   */
+async function createStaticSticker(
+  file
+) {
+  let quality = 80;
 
   let contentScale = 1;
 
-  let quality = 0.85;
-
-  let blob = null;
-
   /*
-   * المحاولات:
+   * نحاول عدة مستويات.
    *
-   * 1. جودة عالية
-   * 2. جودة متوسطة
-   * 3. جودة منخفضة
-   * 4. تصغير المحتوى
+   * الـCanvas النهائي دائمًا 512×512.
    */
 
   for (
@@ -517,66 +529,24 @@ async function createStaticSticker(file) {
     attempt < 30;
     attempt++
   ) {
-
-    const canvas =
-      document.createElement(
-        "canvas"
-      );
-
-    canvas.width = 512;
-    canvas.height = 512;
-
-    const ctx =
-      canvas.getContext(
-        "2d",
-        {
-          alpha: true
-        }
-      );
-
-    if (!ctx) {
-      throw new Error(
-        "تعذر إنشاء Canvas."
-      );
-    }
-
-    ctx.clearRect(
-      0,
-      0,
-      512,
-      512
+    setStatus(
+      `جاري ضغط ${file.name}...`
     );
 
-    /*
-     * حجم محتوى الصورة
-     */
-
-    const drawSize =
-      Math.round(
-        512 * contentScale
+    const imageData =
+      await imageToImageData(
+        file,
+        contentScale
       );
 
-    const offset =
-      Math.round(
-        (512 - drawSize) / 2
-      );
-
-    ctx.drawImage(
-      originalCanvas,
-      offset,
-      offset,
-      drawSize,
-      drawSize
-    );
-
-    blob =
-      await canvasToWebP(
-        canvas,
+    const blob =
+      await encodeImageData(
+        imageData,
         quality
       );
 
     /*
-     * نجحنا
+     * نجاح
      */
 
     if (
@@ -593,43 +563,43 @@ async function createStaticSticker(file) {
     }
 
     /*
-     * أول شيء:
-     * نقلل الجودة.
+     * نقلل الجودة أولًا.
      */
 
     if (
-      quality > 0.30
+      quality > 30
     ) {
-      quality -= 0.08;
+      quality -= 10;
 
       continue;
     }
 
     /*
-     * إذا الجودة وصلت للحد
-     * وما زال الحجم كبيرًا،
-     * نصغر محتوى الصورة.
+     * إذا وصلنا لجودة منخفضة جدًا،
+     * نصغر محتوى الصورة داخل 512×512.
      */
 
-    contentScale -= 0.10;
-
-    quality = 0.50;
-
     if (
-      contentScale < 0.45
+      contentScale > 0.45
     ) {
-      break;
+      contentScale -= 0.10;
+
+      quality = 50;
+
+      continue;
     }
+
+    break;
   }
 
   throw new Error(
-    `${file.name} كبير جدًا حتى بعد الضغط.`
+    `${file.name} ما قدرنا نضغطه إلى أقل من 100KB.`
   );
 }
 
 
 /* =========================================
-   GIF CHECK
+   GIF VALIDATION
 ========================================= */
 
 async function prepareGIF(file) {
@@ -645,21 +615,14 @@ async function prepareGIF(file) {
     );
   }
 
-  /*
-   * نتأكد من توقيع GIF:
-   *
-   * GIF87a
-   * GIF89a
-   */
-
-  const bytes =
+  const headerBytes =
     new Uint8Array(
       buffer.slice(0, 6)
     );
 
   const header =
     String.fromCharCode(
-      ...bytes
+      ...headerBytes
     );
 
   if (
@@ -680,19 +643,28 @@ async function prepareGIF(file) {
 ========================================= */
 
 async function createCover(file) {
-  const canvas =
-    await imageToCanvas(file);
+  const imageData =
+    await imageToImageData(
+      file,
+      1
+    );
 
-  const cover =
+  /*
+   * للـCover نستخدم أول إطار
+   * من GIF إذا كان GIF مدعومًا
+   * بواسطة المتصفح.
+   */
+
+  const canvas =
     document.createElement(
       "canvas"
     );
 
-  cover.width = 96;
-  cover.height = 96;
+  canvas.width = 96;
+  canvas.height = 96;
 
   const ctx =
-    cover.getContext("2d");
+    canvas.getContext("2d");
 
   if (!ctx) {
     throw new Error(
@@ -700,8 +672,29 @@ async function createCover(file) {
     );
   }
 
+  /*
+   * ImageData = 512×512
+   */
+
+  const temp =
+    document.createElement(
+      "canvas"
+    );
+
+  temp.width = 512;
+  temp.height = 512;
+
+  const tempCtx =
+    temp.getContext("2d");
+
+  tempCtx.putImageData(
+    imageData,
+    0,
+    0
+  );
+
   ctx.drawImage(
-    canvas,
+    temp,
     0,
     0,
     96,
@@ -710,7 +703,7 @@ async function createCover(file) {
 
   return new Promise(
     (resolve, reject) => {
-      cover.toBlob(
+      canvas.toBlob(
         blob => {
           if (!blob) {
             reject(
@@ -741,7 +734,7 @@ async function createCover(file) {
 
 
 /* =========================================
-   CREATE STICKER PACK
+   CREATE PACK
 ========================================= */
 
 async function createStickerPack() {
@@ -769,10 +762,6 @@ async function createStickerPack() {
 
   let coverFile = null;
 
-  /*
-   * معالجة الملفات واحدًا واحدًا
-   */
-
   for (
     let i = 0;
     i < selectedFiles.length;
@@ -788,8 +777,11 @@ async function createStickerPack() {
     if (isGIF(file)) {
 
       /*
-       * GIF:
-       * نتحقق منه ونحتفظ به مؤقتًا.
+       * GIF حاليًا يتم التحقق منه
+       * والاحتفاظ به كما هو.
+       *
+       * تحويله إلى Animated WebP
+       * يحتاج مسار Encoder متحرك مستقل.
        */
 
       await prepareGIF(file);
@@ -802,18 +794,14 @@ async function createStickerPack() {
 
     } else {
 
-      /*
-       * صورة ثابتة
-       */
-
-      const webp =
+      const webpFile =
         await createStaticSticker(
           file
         );
 
       outputFiles.push({
         original: file,
-        output: webp,
+        output: webpFile,
         animated: false
       });
     }
@@ -823,10 +811,20 @@ async function createStickerPack() {
      */
 
     if (i === 0) {
-      coverFile =
-        await createCover(
-          file
-        );
+      /*
+       * الغلاف للصور الثابتة.
+       * إذا كان أول عنصر GIF،
+       * نحاول أخذ أول صورة منه.
+       */
+
+      if (isGIF(file)) {
+        coverFile = null;
+      } else {
+        coverFile =
+          await createCover(
+            file
+          );
+      }
     }
   }
 
@@ -866,7 +864,7 @@ createButton.addEventListener(
     try {
 
       setBridgeStatus(
-        "جاري تجهيز حزمة الملصقات..."
+        "جاري تحويل الصور إلى WebP..."
       );
 
       const result =
@@ -888,7 +886,7 @@ createButton.addEventListener(
         ).length;
 
       setStatus(
-        `تم تجهيز ${generatedFiles.length} ملصق: ${staticCount} صورة و${gifCount} GIF.`
+        `تم تجهيز ${generatedFiles.length} ملف: ${staticCount} صورة و${gifCount} GIF.`
       );
 
       setBridgeStatus(
@@ -949,21 +947,16 @@ whatsappButton.addEventListener(
             item.output
         );
 
-      /*
-       * Web Share API
-       */
-
       if (
         navigator.share &&
         navigator.canShare
       ) {
 
-        const canShare =
+        if (
           navigator.canShare({
             files
-          });
-
-        if (canShare) {
+          })
+        ) {
 
           await navigator.share({
             files,
