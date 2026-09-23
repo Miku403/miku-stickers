@@ -3,44 +3,19 @@
 /*
 =========================================================
  MIKU STICKERS
- TEST VERSION
- اختيار الصور + عرضها فقط
+ اختيار الصور + GIF معًا
 =========================================================
 */
 
-const fileInput =
-  document.getElementById("fileInput");
-
-const preview =
-  document.getElementById("preview");
-
-const status =
-  document.getElementById("status");
-
-const createButton =
-  document.getElementById("createButton");
-
-const whatsappButton =
-  document.getElementById("whatsappButton");
-
-const bridgeStatus =
-  document.getElementById("bridgeStatus");
-
-const packNameInput =
-  document.getElementById("packName");
-
-
-/* ======================================================
-   SETTINGS
-====================================================== */
+const fileInput = document.getElementById("fileInput");
+const preview = document.getElementById("preview");
+const status = document.getElementById("status");
+const createButton = document.getElementById("createButton");
+const whatsappButton = document.getElementById("whatsappButton");
+const bridgeStatus = document.getElementById("bridgeStatus");
 
 const MIN_STICKERS = 3;
 const MAX_STICKERS = 30;
-
-
-/* ======================================================
-   STATE
-====================================================== */
 
 let selectedFiles = [];
 
@@ -57,7 +32,7 @@ function setStatus(message) {
 
 
 /* ======================================================
-   FILE SIZE
+   SIZE
 ====================================================== */
 
 function formatBytes(bytes) {
@@ -70,11 +45,7 @@ function formatBytes(bytes) {
     return `${(bytes / 1024).toFixed(1)} KB`;
   }
 
-  return `${(
-    bytes /
-    1024 /
-    1024
-  ).toFixed(2)} MB`;
+  return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 }
 
 
@@ -102,42 +73,29 @@ function renderPreview(files) {
 
   files.forEach((file, index) => {
 
-    const card =
-      document.createElement("div");
+    const card = document.createElement("div");
 
-    card.className =
-      "sticker-card";
+    card.className = "sticker-card";
 
 
-    const img =
-      document.createElement("img");
+    const img = document.createElement("img");
 
 
-    const number =
-      document.createElement("div");
+    const number = document.createElement("div");
 
-    number.className =
-      "sticker-number";
-
-    number.textContent =
-      `#${index + 1}`;
+    number.className = "sticker-number";
+    number.textContent = `#${index + 1}`;
 
 
-    const size =
-      document.createElement("div");
+    const size = document.createElement("div");
 
-    size.className =
-      "sticker-size";
-
-    size.textContent =
-      formatBytes(file.size);
+    size.className = "sticker-size";
+    size.textContent = formatBytes(file.size);
 
 
-    const type =
-      document.createElement("div");
+    const type = document.createElement("div");
 
-    type.className =
-      "sticker-type";
+    type.className = "sticker-type";
 
     type.textContent =
       isGIF(file)
@@ -145,26 +103,20 @@ function renderPreview(files) {
         : "صورة";
 
 
-    const url =
-      URL.createObjectURL(file);
-
+    const url = URL.createObjectURL(file);
 
     img.src = url;
 
-
     img.onload = () => {
-
       URL.revokeObjectURL(url);
-
     };
-
 
     img.onerror = () => {
 
       URL.revokeObjectURL(url);
 
       console.error(
-        "تعذر عرض الصورة:",
+        "تعذر عرض الملف:",
         file.name
       );
 
@@ -192,7 +144,7 @@ fileInput.addEventListener(
   () => {
 
     console.log(
-      "MIKU STICKERS: change event"
+      "MIKU STICKERS: files selected"
     );
 
 
@@ -203,20 +155,17 @@ fileInput.addEventListener(
 
 
     console.log(
-      "Selected files:",
+      "FILES:",
       files
     );
 
 
-    selectedFiles =
-      [];
+    selectedFiles = [];
 
 
-    /*
-    ------------------------------------------------------
-    لا يوجد اختيار
-    ------------------------------------------------------
-    */
+    /* --------------------------------------------------
+       لا يوجد ملفات
+    -------------------------------------------------- */
 
     if (!files.length) {
 
@@ -235,17 +184,13 @@ fileInput.addEventListener(
     }
 
 
-    /*
-    ------------------------------------------------------
-    عدد الملفات
-    ------------------------------------------------------
-    */
+    /* --------------------------------------------------
+       عدد الملفات
+    -------------------------------------------------- */
 
     if (
-      files.length <
-        MIN_STICKERS ||
-      files.length >
-        MAX_STICKERS
+      files.length < MIN_STICKERS ||
+      files.length > MAX_STICKERS
     ) {
 
       preview.innerHTML = "";
@@ -263,98 +208,71 @@ fileInput.addEventListener(
     }
 
 
-    /*
-    ------------------------------------------------------
-    التحقق من GIF + الصور
-    ------------------------------------------------------
-    */
+    /* --------------------------------------------------
+       السماح بالصور + GIF معًا
+    -------------------------------------------------- */
 
-    const hasGIF =
-      files.some(
-        file => isGIF(file)
-      );
+    selectedFiles = files;
 
 
-    const hasStatic =
-      files.some(
-        file => !isGIF(file)
-      );
-
-
-    if (
-      hasGIF &&
-      hasStatic
-    ) {
-
-      preview.innerHTML = "";
-
-      createButton.disabled = true;
-
-      whatsappButton.disabled = true;
-
-      setStatus(
-        "لا يمكن خلط GIF مع الصور الثابتة."
-      );
-
-      if (bridgeStatus) {
-
-        bridgeStatus.textContent =
-          "اختر GIF فقط أو صور ثابتة فقط.";
-
-      }
-
-      return;
-
-    }
-
-
-    /*
-    ------------------------------------------------------
-    حفظ الملفات
-    ------------------------------------------------------
-    */
-
-    selectedFiles =
-      files;
-
-
-    /*
-    ------------------------------------------------------
-    عرض الصور
-    ------------------------------------------------------
-    */
+    /* --------------------------------------------------
+       عرض الملفات
+    -------------------------------------------------- */
 
     renderPreview(
       selectedFiles
     );
 
 
-    /*
-    ------------------------------------------------------
-    تفعيل زر الإنشاء
-    ------------------------------------------------------
-    */
+    /* --------------------------------------------------
+       إحصائيات
+    -------------------------------------------------- */
 
-    createButton.disabled =
-      false;
-
-
-    whatsappButton.disabled =
-      true;
+    const gifCount =
+      files.filter(
+        file => isGIF(file)
+      ).length;
 
 
-    /*
-    ------------------------------------------------------
-    الحالة
-    ------------------------------------------------------
-    */
+    const imageCount =
+      files.length -
+      gifCount;
 
-    if (hasGIF) {
+
+    /* --------------------------------------------------
+       تفعيل زر الإنشاء
+    -------------------------------------------------- */
+
+    createButton.disabled = false;
+
+    whatsappButton.disabled = true;
+
+
+    /* --------------------------------------------------
+       الرسالة
+    -------------------------------------------------- */
+
+    if (
+      gifCount > 0 &&
+      imageCount > 0
+    ) {
 
       setStatus(
-        `تم اختيار ${files.length} GIF بنجاح.`
+        `تم اختيار ${files.length} ملف: ${imageCount} صورة و${gifCount} GIF.`
       );
 
+      if (bridgeStatus) {
+
+        bridgeStatus.textContent =
+          "تم تحميل الصور وGIF معًا.";
+
+      }
+
+    } else if (gifCount > 0) {
+
+      setStatus(
+        `تم اختيار ${gifCount} GIF بنجاح.`
+      );
 
       if (bridgeStatus) {
 
@@ -366,9 +284,8 @@ fileInput.addEventListener(
     } else {
 
       setStatus(
-        `تم اختيار ${files.length} صورة بنجاح.`
+        `تم اختيار ${imageCount} صورة بنجاح.`
       );
-
 
       if (bridgeStatus) {
 
@@ -392,12 +309,11 @@ createButton.addEventListener(
   () => {
 
     if (
-      selectedFiles.length <
-        MIN_STICKERS
+      selectedFiles.length < MIN_STICKERS
     ) {
 
       setStatus(
-        "اختر 3 ملفات على الأقل."
+        `اختر ${MIN_STICKERS} ملفات على الأقل.`
       );
 
       return;
@@ -405,15 +321,26 @@ createButton.addEventListener(
     }
 
 
+    const gifCount =
+      selectedFiles.filter(
+        file => isGIF(file)
+      ).length;
+
+
+    const imageCount =
+      selectedFiles.length -
+      gifCount;
+
+
     setStatus(
-      `تم اختيار ${selectedFiles.length} ملف. نظام التحويل لم يُفعّل بعد.`
+      `جاهز للتحويل: ${imageCount} صورة + ${gifCount} GIF.`
     );
 
 
     if (bridgeStatus) {
 
       bridgeStatus.textContent =
-        "اختبار اختيار الملفات ناجح.";
+        "اختيار الملفات ناجح.";
 
     }
 
@@ -430,7 +357,7 @@ whatsappButton.addEventListener(
   () => {
 
     setStatus(
-      "المشاركة لم تُفعّل في نسخة الاختبار."
+      "المشاركة ستُفعّل بعد الانتهاء من نظام التحويل."
     );
 
   }
@@ -441,11 +368,9 @@ whatsappButton.addEventListener(
    INITIAL STATE
 ====================================================== */
 
-createButton.disabled =
-  true;
+createButton.disabled = true;
 
-whatsappButton.disabled =
-  true;
+whatsappButton.disabled = true;
 
 
 if (bridgeStatus) {
@@ -462,5 +387,5 @@ setStatus(
 
 
 console.log(
-  "MIKU STICKERS APP LOADED SUCCESSFULLY"
+  "MIKU STICKERS APP LOADED"
 );
