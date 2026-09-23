@@ -16,7 +16,7 @@
 
   <meta
     name="description"
-    content="Miku Stickers - تحويل الصور إلى ملصقات WhatsApp"
+    content="Miku Stickers - تحويل الصور وGIF إلى ملصقات WhatsApp"
   >
 
   <title>𝘔𝘐𝘒𝘜 𝘚𝘛𝘐𝘊𝘒𝘌𝘙𝘚</title>
@@ -39,7 +39,7 @@
       </h1>
 
       <p>
-        حوّل صورك إلى ملصقات WhatsApp
+        حوّل صورك وGIF إلى ملصقات WhatsApp
       </p>
 
     </header>
@@ -77,20 +77,21 @@
         </span>
 
         <span>
-          اختر من 3 إلى 30 صورة
+          اختر من 3 إلى 30 صورة أو GIF
         </span>
 
         <small>
-          PNG / JPG / WEBP
+          PNG / JPG / WEBP / GIF
         </small>
 
       </label>
 
 
+      <!-- FILE INPUT -->
       <input
         id="fileInput"
         type="file"
-        accept="image/*"
+        accept="image/png,image/jpeg,image/webp,image/gif"
         multiple
         hidden
       >
@@ -102,7 +103,7 @@
         class="status"
         aria-live="polite"
       >
-        اختر من 3 إلى 30 صورة.
+        اختر من 3 إلى 30 صورة أو GIF.
       </div>
 
 
@@ -115,7 +116,7 @@
       </section>
 
 
-      <!-- CREATE -->
+      <!-- CREATE BUTTON -->
       <button
         id="createButton"
         type="button"
@@ -135,14 +136,14 @@
       </div>
 
 
-      <!-- EXPORT -->
+      <!-- SHARE BUTTON -->
       <button
         id="whatsappButton"
         class="secondary"
         type="button"
         disabled
       >
-        إضافة إلى WhatsApp
+        مشاركة إلى Sticker Maker
       </button>
 
     </section>
@@ -151,6 +152,7 @@
     <!-- INFO -->
     <section class="info">
 
+      <!-- STATIC -->
       <div class="info-item">
 
         <strong>
@@ -164,18 +166,38 @@
       </div>
 
 
+      <!-- SIZE -->
       <div class="info-item">
 
         <strong>
-          ≤ 100KB
+          ≤100KB
         </strong>
 
         <span>
-          حجم الملصق
+          الملصق الثابت
         </span>
 
       </div>
 
+
+      <!-- ANIMATED -->
+      <div class="info-item">
+
+        <strong>
+          ≤500KB
+        </strong>
+
+        <span>
+          الملصق المتحرك
+        </span>
+
+      </div>
+
+    </section>
+
+
+    <!-- EXTRA INFO -->
+    <section class="info">
 
       <div class="info-item">
 
@@ -185,6 +207,32 @@
 
         <span>
           عدد الملصقات
+        </span>
+
+      </div>
+
+
+      <div class="info-item">
+
+        <strong>
+          WebP
+        </strong>
+
+        <span>
+          صيغة الملصقات
+        </span>
+
+      </div>
+
+
+      <div class="info-item">
+
+        <strong>
+          GIF
+        </strong>
+
+        <span>
+          ملصقات متحركة
         </span>
 
       </div>
@@ -206,15 +254,17 @@
 
   <!-- ==================================================
        JSZip
-       يجب تحميله قبل app.js
-       ================================================== -->
+  ================================================== -->
 
   <script
     src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"
   ></script>
 
 
-  <!-- APP -->
+  <!-- ==================================================
+       APP
+  ================================================== -->
+
   <script
     type="module"
     src="js/app.js"
